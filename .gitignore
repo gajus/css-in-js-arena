@@ -1,0 +1,14 @@
+.DS_Store
+.env
+
+node_modules/
+
+# Screenshots and diff images produced by tools/compare.mjs — regenerated on
+# every parity run, ~12 MB, and meaningless outside the run that made them.
+tools/shots/
+
+# Build output and generated code. Also covered by the per-app .gitignore
+# files; repeated here so a checkout is clean regardless of where you run from.
+build/
+.react-router/
+apps/bamboo/styled-system/

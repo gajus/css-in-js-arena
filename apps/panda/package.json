@@ -1,0 +1,31 @@
+{
+  "name": "demo-panda",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "panda codegen --silent && react-router build",
+    "dev": "react-router dev",
+    "codegen": "panda codegen",
+    "start": "react-router-serve ./build/server/index.js",
+    "typecheck": "panda codegen --silent && react-router typegen && tsc"
+  },
+  "dependencies": {
+    "@react-router/node": "^8",
+    "@react-router/serve": "^8",
+    "isbot": "^5.1.36",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router": "^8"
+  },
+  "devDependencies": {
+    "@pandacss/dev": "^1.12.0",
+    "@pandacss/postcss": "^1.12.0",
+    "@react-router/dev": "^8",
+    "@types/node": "^22",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "postcss": "^8.4.49",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.3"
+  }
+}

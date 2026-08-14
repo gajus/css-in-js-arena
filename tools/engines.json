@@ -1,0 +1,8 @@
+{
+  "reference": "bamboo",
+  "engines": [
+    { "name": "bamboo", "port": 3001, "devPort": 4001 },
+    { "name": "stylex", "port": 3002, "devPort": 4002 },
+    { "name": "panda",  "port": 3003, "devPort": 4003 }
+  ]
+}

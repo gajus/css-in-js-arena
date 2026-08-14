@@ -1,0 +1,4 @@
+/* Panda emits into these layers; the @layer statement fixes their order before
+   any rule is seen. The PostCSS plugin replaces each directive with the
+   generated CSS at build time. */
+@layer reset, base, tokens, recipes, utilities;
