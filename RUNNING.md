@@ -87,6 +87,7 @@ RUNS=7 ./devstart.sh  # dev server cold start
 ./deadcode.sh         # delete a page, see what happens to the CSS
 ./typesafety.sh       # token-name and property-name typos
 node authoring.mjs    # lines of styling code
+node orphan.mjs       # a module matching `include` that nothing imports
 ```
 
 ## Measure HMR — one dev server at a time
@@ -132,13 +133,15 @@ Timing rows are the noisiest thing here and the easiest to misread:
 
 ## Probe hygiene
 
-`typesafety.sh`, `scale.mjs`, `theming.mjs` and the ad-hoc probes deliberately introduce typos,
-inject themes and flip config flags. They restore afterwards, but confirm before you trust a result:
+`typesafety.sh`, `scale.mjs`, `theming.mjs`, `orphan.mjs` and the ad-hoc probes deliberately
+introduce typos, inject themes and flip config flags. They restore afterwards, but confirm before you
+trust a result:
 
 ```bash
 git status                                        # clean apart from README.md
 grep -rnw "acent\|padingBlock" apps/*/app/ui.ts   # must return nothing
 ls apps/*/app/__scale.ts 2>/dev/null              # generated module must be gone
+ls apps/*/app/__orphan.ts 2>/dev/null             # ditto
 find apps/*/styled-system/themes -type f          # no leftover theme artifacts
 ```
 

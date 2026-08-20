@@ -7,17 +7,17 @@ so the numbers isolate the engine and nothing else.
 
 | Engine | Integration | Version |
 | --- | --- | --- |
-| [Bamboo CSS](https://bamboocss.com) | `@bamboocss/vite` | 1.45.3 |
+| [Bamboo CSS](https://bamboocss.com) | `@bamboocss/vite` | 1.46.0 |
 | [StyleX](https://stylexjs.com) | `@stylexjs/unplugin` | 0.19.0 |
 | [Panda CSS](https://panda-css.com) | `@pandacss/postcss` | 1.12.0 |
 
-Measured 2026-08-18 at the versions above · macOS, Node 24.10, Vite 8.2.1
+Measured 2026-08-19 at the versions above · macOS, Node 24.10, Vite 8.2.1
 
 | Engine | Shipped bytes | Build & dev | Authoring | Correctness & maintenance | Rows won 🏆 |
 | --- | --- | --- | --- | --- | --- |
-| **Bamboo** 🏆 | **8** / 10 🏆 | **3** / 6 🏆 | **7** / 8 🏆 | **4** / 4 🏆 | **22** / 28 🏆 |
+| **Bamboo** 🏆 | **9** / 10 🏆 | **3** / 6 🏆 | **7** / 8 🏆 | **4** / 4 🏆 | **23** / 28 🏆 |
 | StyleX | 3 / 10 | 1 / 6 | 2 / 8 | 1 / 4 | 7 / 28 |
-| Panda | 2 / 10 | 2 / 6 | 6 / 8 | 1 / 4 | 11 / 28 |
+| Panda | 2 / 10 | **3** / 6 🏆 | 6 / 8 | 1 / 4 | 12 / 28 |
 
 Rows won per category, out of the scored rows in each. They are not equally weighted and two are
 unscored, so the tally is a scanning aid rather than the judgement — and **the byte margins do not
@@ -30,24 +30,24 @@ survive scale**, as the next section shows.
 | Axis | Bamboo 🏆 | StyleX | Panda | Margin |
 | --- | --- | --- | --- | --- |
 | **Shipped bytes** | | | | |
-| Full first load | **104,911 B** 🏆 | 106,117 B | 112,840 B | −1.1% / −7.0% |
-| CSS, brotli | **6,802 B** 🏆 | 7,008 B | 9,518 B | −2.9% / −29% |
-| CSS, gzip | **7,876 B** 🏆 | 8,176 B | 11,524 B | −3.7% / −32% |
-| CSS, raw | **37,227 B** 🏆 | 40,430 B | 54,007 B | −7.9% / −31% |
+| Full first load | **104,938 B** 🏆 | 106,117 B | 112,840 B | −1.1% / −7.0% |
+| CSS, brotli | **6,825 B** 🏆 | 7,008 B | 9,518 B | −2.6% / −28% |
+| CSS, gzip | **7,909 B** 🏆 | 8,176 B | 11,524 B | −3.3% / −31% |
+| CSS, raw | **37,326 B** 🏆 | 40,430 B | 54,007 B | −7.7% / −31% |
 | CSS rules emitted | 525 | 467 | 532 | not a quality axis |
 | Client JS, brotli | **92,569 B** 🏆 | 93,583 B | 97,778 B | −1.1% / −5.3% |
-| SSR HTML, gzip (mean of 6) | 5,540 B | 5,526 B | 5,544 B | tie — spread 0.3% |
+| SSR HTML, gzip (mean of 6) | 5,544 B | 5,526 B | 5,544 B | tie — spread 0.3% |
 | Class attribute bytes, raw | 93,036 B | **70,843 B** 🏆 | 92,738 B | −24% |
 | — on the selector-heavy route | **11,728 B** 🏆 | **11,754 B** 🏆 | **11,685 B** 🏆 | tie — spread 0.6% |
 | Unreachable CSS shipped | **0 B** 🏆 | 344 B | n/a — runtime | only engine at zero |
-| Orphan file in `include`, imported by nothing | +7,200 B | **+0 B** 🏆 | +7,200 B | only StyleX scopes to the bundle graph |
+| Orphan file in `include` (50 styles), imported by nothing | **+0 B** 🏆 | **+0 B** 🏆 | +13,200 B | only Panda emits for a module nothing imports |
 | Stylesheets emitted | **1** 🏆 | 2 | **1** 🏆 | StyleX emits an unreferenced duplicate |
 | **Build & dev** | | | | |
-| Production build, cold | **1,564 ms** 🏆 | 2,336 ms | 1,611 ms | −2.9% / −33% |
-| Production build, warm | **1,591 ms** 🏆 | 2,293 ms | 1,704 ms | −6.6% / −31% |
-| Dev server cold start | 1,725 ms | 1,434 ms | **1,300 ms** 🏆 | −9.3% / −25% |
-| HMR — edit a shared style module | 213 ms | **103 ms** 🏆 | 183 ms | −44% / −52% |
-| HMR — edit a component file | 189 ms | 229 ms | **118 ms** 🏆 | −38% / −48% |
+| Production build, cold | **1,572 ms** 🏆 | 2,301 ms | 1,608 ms | −2.2% / −32% |
+| Production build, warm | **1,561 ms** 🏆 | 2,299 ms | **1,587 ms** 🏆 | Bamboo ≡ Panda (1.7%); StyleX +47% |
+| Dev server cold start | 1,617 ms | 1,410 ms | **1,286 ms** 🏆 | −8.8% / −20% |
+| HMR — edit a shared style module | 232 ms | **103 ms** 🏆 | 174 ms | −41% / −56% |
+| HMR — edit a component file | 217 ms | 247 ms | **120 ms** 🏆 | −45% / −51% |
 | HMR payload, one shared edit | **336 KB · 9** 🏆 | 356 KB · 10 | 402 KB · 9 | −5.5% / −16% |
 | **Authoring** | | | | |
 | Total lines written | **3,921** 🏆 | 4,090 | **3,930** 🏆 | Bamboo ≡ Panda (0.2%); StyleX +4.3% |
@@ -61,10 +61,10 @@ survive scale**, as the next section shows.
 | **Correctness & maintenance** | | | | |
 | Mistyped token name | **build fails** 🏆 | TS error, build succeeds | not caught at all | only engine that fails the build |
 | Mistyped property name | **caught** (TS2561) 🏆 | ships `pading-block` | **caught** (TS2561) 🏆 | StyleX ships it |
-| Delete a page → CSS shrinks | **−20.1%** 🏆 | −8.4% | −13.5% | reclaims the most |
+| Delete a page → CSS shrinks | **−20.0%** 🏆 | −8.4% | −13.5% | reclaims the most |
 | Class names folded to literals | **522 / 522** 🏆 | **453 / 458** 🏆 | 25 / 529 | Panda computes the rest in the browser, from a 14.7 KB runtime chunk |
 | | | | | |
-| **Rows won** 🏆 | **22** | **7** | **11** | of 28 scored |
+| **Rows won** 🏆 | **23** | **7** | **12** | of 28 scored |
 
 ---
 
@@ -75,7 +75,7 @@ has, and whether it ships more than light and dark.
 
 ### Style volume
 
-The main table describes an app of 549 rule blocks. Real applications run an order of magnitude past
+The main table describes an app of 570 rule blocks. Real applications run an order of magnitude past
 that, where fixed overhead stops mattering and marginal cost per rule becomes everything.
 
 `tools/scale.mjs` generates *N* style definitions with all-distinct values and measures the emitted
@@ -85,10 +85,10 @@ stylesheet, isolating each engine's true cost per rule.
 
 | Style definitions | Bamboo | StyleX | Panda |
 | --- | --- | --- | --- |
-| 0 — the app as it ships | ref | +3.0% | +39.9% |
-| 50 | ref | +18.0% | +35.4% |
-| 200 | ref | +50.2% | +28.0% |
-| 800 | ref | **+102.9%** | **+16.3%** |
+| 0 — the app as it ships | ref | +2.7% | +39.5% |
+| 50 | ref | +17.7% | +35.0% |
+| 200 | ref | +49.4% | +27.3% |
+| 800 | ref | **+101.5%** | **+15.5%** |
 
 Both challengers move, in opposite directions. **The ranking at the arena's size is not the ranking
 at production size.**
@@ -96,12 +96,12 @@ at production size.**
 | | Marginal cost per declaration | Gap to Bamboo at n=0 | at n=800 |
 | --- | --- | --- | --- |
 | Bamboo | 40.3 B raw · 2.0 B brotli | ref | ref |
-| Panda | 40.3 B raw · 2.0 B brotli | +16,903 B | +16,903 B |
-| StyleX | 65.8 B raw · 5.5 B brotli | +4,222 B | +126,621 B |
+| Panda | 40.3 B raw · 2.0 B brotli | +16,681 B | +16,681 B |
+| StyleX | 65.8 B raw · 5.5 B brotli | +3,104 B | +125,503 B |
 
 **Panda's marginal cost is identical to Bamboo's, to the byte.** Its whole penalty is a fixed
-16,903 B of scaffolding — the same constant at 0 styles and at 800 — so "Panda ships 40% more CSS" is
-a statement about a small app, not about Panda. StyleX is the reverse: almost pure slope, growing 30×
+16,681 B of scaffolding — the same constant at 0 styles and at 800 — so "Panda ships 40% more CSS" is
+a statement about a small app, not about Panda. StyleX is the reverse: almost pure slope, growing 40×
 across the same range, because every rule carries `:not(#\#)` specificity padding that repeats per
 declaration and compresses poorly.
 
@@ -116,9 +116,9 @@ with a light and a dark value.
 
 | Brand themes | Bamboo | StyleX | Panda |
 | --- | --- | --- | --- |
-| 0 | 6,802 B | 7,008 B | 9,518 B |
-| 2 | 6,802 B | 7,427 B | 9,518 B |
-| 8 | 6,802 B | 8,350 B | 9,518 B |
+| 0 | 6,825 B | 7,008 B | 9,518 B |
+| 2 | 6,825 B | 7,427 B | 9,518 B |
+| 8 | 6,825 B | 8,350 B | 9,518 B |
 | **added per theme** | **0 B** 🏆 | +168 B | **0 B** 🏆 |
 
 **Theme payload, fetched only when a theme is selected:**
@@ -191,5 +191,28 @@ exactly what its engine wrote.
 
 StyleX still shows some Lightning CSS output because `@stylexjs/unplugin` depends on it directly —
 that is part of its product, not the harness.
+
+</details>
+
+<details>
+<summary><strong>What does the orphan-file row actually measure?</strong></summary>
+
+A module that matches the engine's `include` glob but that nothing imports — the file a deleted
+feature leaves behind. `tools/orphan.mjs` writes one carrying 50 style definitions, rebuilds, and
+diffs the stylesheet.
+
+Panda extracts from source text, so it scans the file and ships its CSS regardless of whether the
+bundle reaches it. Bamboo and StyleX both scope to the bundle graph and emit nothing. The 13,200 B
+is a property of the fixture; the finding is which engines are at zero.
+
+</details>
+
+<details>
+<summary><strong>Why do the two build rows disagree about Bamboo and Panda?</strong></summary>
+
+Cold and warm production builds are 2.2% and 1.7% apart respectively, either side of the ~2% spread
+below which this table calls a tie and awards both engines a trophy. The honest reading is that
+Bamboo and Panda build in about the same time and StyleX takes roughly 45% longer; the split verdict
+is the threshold landing between two near-identical measurements, not a difference in kind.
 
 </details>

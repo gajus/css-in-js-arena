@@ -93,7 +93,7 @@ console.log("\n  First paint blocking bytes = CSS(brotli) + HTML(gzip), dashboar
 row("critical path", (o) => o.css.brotli + o.html.dashboard.gzip);
 
 const meanHtml = (o) => ROUTES.reduce((a, [r]) => a + o.html[r].gzip, 0) / ROUTES.length;
-console.log("\n  SSR HTML, gzip (mean of 5):");
+console.log(`\n  SSR HTML, gzip (mean of ${ROUTES.length}):`);
 row("mean", (o) => Math.round(meanHtml(o)));
 
 console.log("\n  Full first load (CSS brotli + JS brotli + mean HTML gzip):");

@@ -119,6 +119,7 @@ RUNS=3 ./devstart.sh  # dev server cold start
 ./deadcode.sh         # delete a page, see what happens to the CSS
 ./typesafety.sh       # token-name and property-name typos
 node authoring.mjs    # lines of styling code
+node orphan.mjs       # a module matching `include` that nothing imports
 node theming.mjs      # cost of N brand themes — reported separately, not in the main table
 node scale.mjs        # marginal cost per rule at 0/50/200/800 styles — reported separately
 ```
@@ -168,10 +169,11 @@ Three categories, all under `tools/`:
 - **Add a per-engine edit anchor** — `hmr.mjs`, `hmr-fanout.mjs`, `hmr-payload.mjs` each keep a map
   of "which file and which exact string to edit" to trigger a style change. Needs one entry per
   engine, pointing at an equivalent shared style module and component file.
-- **Add a per-engine style generator** — `scale.mjs` writes N distinct style definitions in that
-  engine's syntax and needs an entry in its `generated` map. Bamboo and Panda extract from any file
-  matching `include`; StyleX only sees modules in the bundle graph, so its generated module has to be
-  imported and its styles referenced or the measurement silently reads zero.
+- **Add a per-engine style generator** — `scale.mjs` and `orphan.mjs` write N distinct style
+  definitions in that engine's syntax and each needs an entry in its `generated` map. `scale.mjs`
+  imports the generated module, because StyleX only sees modules in the bundle graph and the
+  measurement would silently read zero otherwise; `orphan.mjs` deliberately does not import it, which
+  is the whole axis it measures.
 - **Add a per-engine theme injector** — `theming.mjs` writes N brand themes into each engine's own
   multi-theme API and rebuilds. Needs an entry in its `targets` map (which file to edit) and a
   generator emitting that engine's theme syntax. If the engine has no multi-theme API, say so in the
@@ -233,6 +235,7 @@ git status                                        # clean apart from README.md
 grep -rnw "acent\|padingBlock" apps/*/app/ui.ts   # must return nothing (-w: "adjacent" is not a hit)
 grep -rn "tools/theming.mjs" apps/*/app/          # generated themes must be gone
 ls apps/*/app/__scale.ts 2>/dev/null                # scale.mjs module must be gone
+ls apps/*/app/__orphan.ts 2>/dev/null               # orphan.mjs module must be gone
 find apps/*/styled-system/themes -type f          # no leftover theme artifacts
 ```
 
