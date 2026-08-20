@@ -134,10 +134,16 @@ Run these **sequentially**, never concurrently.
 
 ```bash
 cd apps/bamboo && npm run dev -- --port 4001 &
-cd tools && node hmr-fanout.mjs bamboo 4001 5   # shared style module vs component file
+cd tools && node hmr-fanout.mjs bamboo 4001 10  # shared style module vs component file
 node hmr-payload.mjs bamboo 4001                # what the browser refetches
 # kill it, then repeat for the next engine on 4002, 4003, …
 ```
+
+`hmr-fanout.mjs` needs **two passes with the engine order reversed** (bamboo→stylex→panda, then
+panda→stylex→bamboo), pooled before taking the median. A single pass drifts more over its own
+runtime than the engines differ from each other, so it silently rewards whichever engine ran first —
+a 25-run single pass is *worse* than 2×10 reversed, because it buys precision inside one drift
+window without correcting for the window. See `RUNNING.md` for the full note.
 
 Note: the dev server binds IPv6 `localhost` only. `127.0.0.1` refuses the connection — the
 production server does not have this problem.

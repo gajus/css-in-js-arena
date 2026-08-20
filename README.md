@@ -7,7 +7,7 @@ so the numbers isolate the engine and nothing else.
 
 | Engine | Integration | Version |
 | --- | --- | --- |
-| [Bamboo CSS](https://bamboocss.com) | `@bamboocss/vite` | 1.46.0 |
+| [Bamboo CSS](https://bamboocss.com) | `@bamboocss/vite` | 1.46.1 |
 | [StyleX](https://stylexjs.com) | `@stylexjs/unplugin` | 0.19.0 |
 | [Panda CSS](https://panda-css.com) | `@pandacss/postcss` | 1.12.0 |
 
@@ -16,8 +16,8 @@ Measured 2026-08-19 at the versions above · macOS, Node 24.10, Vite 8.2.1
 | Engine | Shipped bytes | Build & dev | Authoring | Correctness & maintenance | Rows won 🏆 |
 | --- | --- | --- | --- | --- | --- |
 | **Bamboo** 🏆 | **9** / 10 🏆 | **3** / 6 🏆 | **7** / 8 🏆 | **4** / 4 🏆 | **23** / 28 🏆 |
-| StyleX | 3 / 10 | 1 / 6 | 2 / 8 | 1 / 4 | 7 / 28 |
-| Panda | 2 / 10 | **3** / 6 🏆 | 6 / 8 | 1 / 4 | 12 / 28 |
+| StyleX | 5 / 10 | 1 / 6 | 2 / 8 | 1 / 4 | 9 / 28 |
+| Panda | 2 / 10 | 2 / 6 | 6 / 8 | 1 / 4 | 11 / 28 |
 
 Rows won per category, out of the scored rows in each. They are not equally weighted and two are
 unscored, so the tally is a scanning aid rather than the judgement — and **the byte margins do not
@@ -30,12 +30,12 @@ survive scale**, as the next section shows.
 | Axis | Bamboo 🏆 | StyleX | Panda |
 | --- | --- | --- | --- |
 | **Shipped bytes** | | | |
-| Full first load | **104,938 B** 🏆 | 106,117 B | 112,840 B |
+| Full first load | **104,938 B** 🏆 | **106,117 B** 🏆 | 112,840 B |
 | CSS, brotli | **6,825 B** 🏆 | 7,008 B | 9,518 B |
 | CSS, gzip | **7,909 B** 🏆 | 8,176 B | 11,524 B |
 | CSS, raw | **37,326 B** 🏆 | 40,430 B | 54,007 B |
 | CSS rules emitted — *not a quality axis* | 525 | 467 | 532 |
-| Client JS, brotli | **92,569 B** 🏆 | 93,583 B | 97,778 B |
+| Client JS, brotli | **92,569 B** 🏆 | **93,583 B** 🏆 | 97,778 B |
 | SSR HTML, gzip (mean of 6) — *tie, spread 0.3%* | 5,544 B | 5,526 B | 5,544 B |
 | Class attribute bytes, raw | 93,036 B | **70,843 B** 🏆 | 92,738 B |
 | — on the selector-heavy route | **11,728 B** 🏆 | **11,754 B** 🏆 | **11,685 B** 🏆 |
@@ -43,11 +43,11 @@ survive scale**, as the next section shows.
 | Orphan file in `include` (50 styles), imported by nothing | **+0 B** 🏆 | **+0 B** 🏆 | +13,200 B |
 | Stylesheets emitted | **1** 🏆 | 2 — one unreferenced | **1** 🏆 |
 | **Build & dev** | | | |
-| Production build, cold | **1,572 ms** 🏆 | 2,301 ms | 1,608 ms |
-| Production build, warm | **1,561 ms** 🏆 | 2,299 ms | **1,587 ms** 🏆 |
-| Dev server cold start | 1,617 ms | 1,410 ms | **1,286 ms** 🏆 |
-| HMR — edit a shared style module | 232 ms | **103 ms** 🏆 | 174 ms |
-| HMR — edit a component file | 217 ms | 247 ms | **120 ms** 🏆 |
+| Production build, cold | **1,537 ms** 🏆 | 2,293 ms | 1,568 ms |
+| Production build, warm | **1,540 ms** 🏆 | 2,284 ms | 1,578 ms |
+| Dev server cold start | 1,607 ms | 1,397 ms | **1,282 ms** 🏆 |
+| HMR — edit a shared style module | 139 ms | **107 ms** 🏆 | 136 ms |
+| HMR — edit a component file | 184 ms | 228 ms | **111 ms** 🏆 |
 | HMR payload, one shared edit | **336 KB · 9** 🏆 | 356 KB · 10 | 402 KB · 9 |
 | **Authoring** | | | |
 | Total lines written | **3,921** 🏆 | 4,090 | **3,930** 🏆 |
@@ -64,7 +64,7 @@ survive scale**, as the next section shows.
 | Delete a page → CSS shrinks | **−20.0%** 🏆 | −8.4% | −13.5% |
 | Class names folded to literals | **522 / 522** 🏆 | **453 / 458** 🏆 | 25 / 529 — rest computed in the browser, from a 14.7 KB runtime chunk |
 | | | | |
-| **Rows won**, of 28 scored 🏆 | **23** | **7** | **12** |
+| **Rows won**, of 28 scored 🏆 | **23** | **9** | **11** |
 
 ---
 
@@ -208,11 +208,20 @@ is a property of the fixture; the finding is which engines are at zero.
 </details>
 
 <details>
-<summary><strong>Why do the two build rows disagree about Bamboo and Panda?</strong></summary>
+<summary><strong>How much weight do the timing rows carry?</strong></summary>
 
-Cold and warm production builds are 2.2% and 1.7% apart respectively, either side of the ~2% spread
-below which this table calls a tie and awards both engines a trophy. The honest reading is that
-Bamboo and Panda build in about the same time and StyleX takes roughly 45% longer; the split verdict
-is the threshold landing between two near-identical measurements, not a difference in kind.
+Less than the byte rows, on two counts.
+
+Bamboo takes the production-build rows over Panda by 2.0% cold and 2.5% warm — barely clear of the
+~2% spread below which this table calls a tie and trophies both engines. Read those two rows as
+"Bamboo and Panda are close, StyleX takes ~48% longer", which is the part that is not close.
+
+The HMR rows are the noisiest here. Edit-to-browser latency is bimodal for all three engines — runs
+cluster around ~100 ms and ~200 ms rather than around one value — so each median summarises a split
+distribution, not a typical frame, and what separates the engines is how often each lands in the slow
+cluster. The medians shown pool two passes measured in opposite engine order, because a single pass
+drifts enough over its own runtime to hand whichever engine goes first a materially better number.
+`hmr-fanout.mjs` also cannot isolate an engine's own work from Vite's HMR protocol, React Fast
+Refresh, or the socket round trip.
 
 </details>

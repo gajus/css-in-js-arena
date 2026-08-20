@@ -97,10 +97,27 @@ Run these **sequentially, never concurrently** — parallel dev servers skew eve
 ```bash
 cd apps/bamboo && npm run dev -- --port 4001 &
 cd tools
-node hmr-fanout.mjs bamboo 4001 15   # shared style module vs component file
+node hmr-fanout.mjs bamboo 4001 10   # shared style module vs component file
 node hmr-payload.mjs bamboo 4001     # what the browser refetches
 # kill it, then repeat for the next engine on 4002, 4003
 ```
+
+`hmr-payload.mjs` is deterministic — one run per engine is enough.
+
+`hmr-fanout.mjs` is not, and **a single pass over the three engines is not a fair comparison.** The
+machine drifts by more over the ten minutes such a pass takes than the engines differ from each
+other, so whichever engine runs first gets a materially better number. Run the sweep twice with the
+engine order reversed in the second pass and pool the runs before taking a median:
+
+```bash
+# pass 1: bamboo → stylex → panda      (10 runs each)
+# pass 2: panda → stylex → bamboo      (10 runs each)
+```
+
+Pooling 2×10 that way beats a single 25-run pass, which buys precision inside one drift window
+without correcting for the window itself. Distributions here are bimodal — clusters near ~100 ms and
+~200 ms — so also sanity-check that the two passes agree per engine before trusting the pooled
+median; if one engine's two passes disagree by more than the gap you are reporting, measure again.
 
 The dev server binds IPv6 `localhost` only — `127.0.0.1` refuses the connection. The production
 server does not have this problem.
