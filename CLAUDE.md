@@ -39,12 +39,16 @@ does not write them back is incomplete. When updating it:
   prose, where a version number *is* the subject (`1.44.0 → 1.45.0`) — those stay.
 - Every number must come from **one contiguous measurement session** on the same machine with
   nothing else heavy running. Never stitch a build time from one run into a byte count from another.
-- One column per engine, plus a `Margin` column explaining the gap.
+- One column per engine and nothing else. **No `Margin` column** — a percentage gap is derivable from
+  the row and reading it off is the reader's job. Where a cell needs a caveat that is *not* derivable
+  ("one unreferenced", "rest computed in the browser"), put it in that engine's own cell, short.
 - Mark every winning cell with `🏆` and bold. Ties under ~2% spread get a trophy on each tied engine,
-  or none at all if the axis is not a quality signal — say so in `Margin` (`tie — spread 0.3%`,
-  `not a quality axis`).
-- Put `🏆` on the overall winner's column header, and end the table with a `**🏆 Rows won**` tally
-  row plus the count of scored rows. Recount it from the rendered table, do not carry it over.
+  or none at all if the axis is not a quality signal — for an unscored row, say why in the `Axis`
+  cell in italics (`— *not a quality axis*`, `— *tie, spread 0.3%*`), since a row with no trophy
+  anywhere is otherwise indistinguishable from an oversight.
+- Put `🏆` on the overall winner's column header, and end the table with a `**Rows won**` tally
+  row carrying the count of scored rows in its label. Recount it from the rendered table, do not
+  carry it over.
 - Keep the **summary table** (top of the document, under the stamp) in sync: one row per engine,
   one column per category (`Shipped bytes`, `Build & dev`, `Authoring`, `Correctness & maintenance`)
   plus the total, each as `won / scored`. Recount it from the rendered detail table too — the two

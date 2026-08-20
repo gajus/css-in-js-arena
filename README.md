@@ -27,44 +27,44 @@ survive scale**, as the next section shows.
 
 ## Full results
 
-| Axis | Bamboo 🏆 | StyleX | Panda | Margin |
-| --- | --- | --- | --- | --- |
-| **Shipped bytes** | | | | |
-| Full first load | **104,938 B** 🏆 | 106,117 B | 112,840 B | −1.1% / −7.0% |
-| CSS, brotli | **6,825 B** 🏆 | 7,008 B | 9,518 B | −2.6% / −28% |
-| CSS, gzip | **7,909 B** 🏆 | 8,176 B | 11,524 B | −3.3% / −31% |
-| CSS, raw | **37,326 B** 🏆 | 40,430 B | 54,007 B | −7.7% / −31% |
-| CSS rules emitted | 525 | 467 | 532 | not a quality axis |
-| Client JS, brotli | **92,569 B** 🏆 | 93,583 B | 97,778 B | −1.1% / −5.3% |
-| SSR HTML, gzip (mean of 6) | 5,544 B | 5,526 B | 5,544 B | tie — spread 0.3% |
-| Class attribute bytes, raw | 93,036 B | **70,843 B** 🏆 | 92,738 B | −24% |
-| — on the selector-heavy route | **11,728 B** 🏆 | **11,754 B** 🏆 | **11,685 B** 🏆 | tie — spread 0.6% |
-| Unreachable CSS shipped | **0 B** 🏆 | 344 B | n/a — runtime | only engine at zero |
-| Orphan file in `include` (50 styles), imported by nothing | **+0 B** 🏆 | **+0 B** 🏆 | +13,200 B | only Panda emits for a module nothing imports |
-| Stylesheets emitted | **1** 🏆 | 2 | **1** 🏆 | StyleX emits an unreferenced duplicate |
-| **Build & dev** | | | | |
-| Production build, cold | **1,572 ms** 🏆 | 2,301 ms | 1,608 ms | −2.2% / −32% |
-| Production build, warm | **1,561 ms** 🏆 | 2,299 ms | **1,587 ms** 🏆 | Bamboo ≡ Panda (1.7%); StyleX +47% |
-| Dev server cold start | 1,617 ms | 1,410 ms | **1,286 ms** 🏆 | −8.8% / −20% |
-| HMR — edit a shared style module | 232 ms | **103 ms** 🏆 | 174 ms | −41% / −56% |
-| HMR — edit a component file | 217 ms | 247 ms | **120 ms** 🏆 | −45% / −51% |
-| HMR payload, one shared edit | **336 KB · 9** 🏆 | 356 KB · 10 | 402 KB · 9 | −5.5% / −16% |
-| **Authoring** | | | | |
-| Total lines written | **3,921** 🏆 | 4,090 | **3,930** 🏆 | Bamboo ≡ Panda (0.2%); StyleX +4.3% |
-| Structural & relational selectors | **one rule on the container** 🏆 | class per cell, `last` in JS | **one rule on the container** 🏆 | StyleX styles only its own element |
-| Next-sibling selector (`+`) | **yes** 🏆 | `~` only, via `when` + a marker | **yes** 🏆 | StyleX has no adjacency form |
-| Variant recipes | **`cva`, typed matrix** 🏆 | compose per call site | **`cva`, typed matrix** 🏆 | StyleX has no equivalent |
-| Light/dark theming | **2 values per token** 🏆 | 3 values per token | 4 values per token | half of Panda's |
-| Dynamic values | inline `style` | **custom property** 🏆 | inline `style` | others break the cascade |
-| Register an `@property` | **`global.vars`** 🏆 | **`stylex.types.*`** 🏆 | **`globalVars`** 🏆 | all three; not via `globalCss` |
-| Animate a registered property | **yes** 🏆 | declaration dropped | **yes** 🏆 | StyleX emits neither the keyframe nor the rule |
-| **Correctness & maintenance** | | | | |
-| Mistyped token name | **build fails** 🏆 | TS error, build succeeds | not caught at all | only engine that fails the build |
-| Mistyped property name | **caught** (TS2561) 🏆 | ships `pading-block` | **caught** (TS2561) 🏆 | StyleX ships it |
-| Delete a page → CSS shrinks | **−20.0%** 🏆 | −8.4% | −13.5% | reclaims the most |
-| Class names folded to literals | **522 / 522** 🏆 | **453 / 458** 🏆 | 25 / 529 | Panda computes the rest in the browser, from a 14.7 KB runtime chunk |
-| | | | | |
-| **Rows won** 🏆 | **23** | **7** | **12** | of 28 scored |
+| Axis | Bamboo 🏆 | StyleX | Panda |
+| --- | --- | --- | --- |
+| **Shipped bytes** | | | |
+| Full first load | **104,938 B** 🏆 | 106,117 B | 112,840 B |
+| CSS, brotli | **6,825 B** 🏆 | 7,008 B | 9,518 B |
+| CSS, gzip | **7,909 B** 🏆 | 8,176 B | 11,524 B |
+| CSS, raw | **37,326 B** 🏆 | 40,430 B | 54,007 B |
+| CSS rules emitted — *not a quality axis* | 525 | 467 | 532 |
+| Client JS, brotli | **92,569 B** 🏆 | 93,583 B | 97,778 B |
+| SSR HTML, gzip (mean of 6) — *tie, spread 0.3%* | 5,544 B | 5,526 B | 5,544 B |
+| Class attribute bytes, raw | 93,036 B | **70,843 B** 🏆 | 92,738 B |
+| — on the selector-heavy route | **11,728 B** 🏆 | **11,754 B** 🏆 | **11,685 B** 🏆 |
+| Unreachable CSS shipped | **0 B** 🏆 | 344 B | n/a — runtime |
+| Orphan file in `include` (50 styles), imported by nothing | **+0 B** 🏆 | **+0 B** 🏆 | +13,200 B |
+| Stylesheets emitted | **1** 🏆 | 2 — one unreferenced | **1** 🏆 |
+| **Build & dev** | | | |
+| Production build, cold | **1,572 ms** 🏆 | 2,301 ms | 1,608 ms |
+| Production build, warm | **1,561 ms** 🏆 | 2,299 ms | **1,587 ms** 🏆 |
+| Dev server cold start | 1,617 ms | 1,410 ms | **1,286 ms** 🏆 |
+| HMR — edit a shared style module | 232 ms | **103 ms** 🏆 | 174 ms |
+| HMR — edit a component file | 217 ms | 247 ms | **120 ms** 🏆 |
+| HMR payload, one shared edit | **336 KB · 9** 🏆 | 356 KB · 10 | 402 KB · 9 |
+| **Authoring** | | | |
+| Total lines written | **3,921** 🏆 | 4,090 | **3,930** 🏆 |
+| Structural & relational selectors | **one rule on the container** 🏆 | class per cell, `last` in JS | **one rule on the container** 🏆 |
+| Next-sibling selector (`+`) | **yes** 🏆 | `~` only, via `when` + a marker | **yes** 🏆 |
+| Variant recipes | **`cva`, typed matrix** 🏆 | compose per call site | **`cva`, typed matrix** 🏆 |
+| Light/dark theming | **2 values per token** 🏆 | 3 values per token | 4 values per token |
+| Dynamic values | inline `style` | **custom property** 🏆 — survives the cascade | inline `style` |
+| Register an `@property` (not via `globalCss`) | **`global.vars`** 🏆 | **`stylex.types.*`** 🏆 | **`globalVars`** 🏆 |
+| Animate a registered property | **yes** 🏆 | declaration dropped — no keyframe, no rule | **yes** 🏆 |
+| **Correctness & maintenance** | | | |
+| Mistyped token name | **build fails** 🏆 | TS error, build succeeds | not caught at all |
+| Mistyped property name | **caught** (TS2561) 🏆 | ships `pading-block` | **caught** (TS2561) 🏆 |
+| Delete a page → CSS shrinks | **−20.0%** 🏆 | −8.4% | −13.5% |
+| Class names folded to literals | **522 / 522** 🏆 | **453 / 458** 🏆 | 25 / 529 — rest computed in the browser, from a 14.7 KB runtime chunk |
+| | | | |
+| **Rows won**, of 28 scored 🏆 | **23** | **7** | **12** |
 
 ---
 
