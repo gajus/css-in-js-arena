@@ -102,7 +102,11 @@ node hmr-payload.mjs bamboo 4001     # what the browser refetches
 # kill it, then repeat for the next engine on 4002, 4003
 ```
 
-`hmr-payload.mjs` is deterministic — one run per engine is enough.
+`hmr-payload.mjs` is deterministic **once the dev server has finished warming** — give it ~10s after
+the port answers, and take the second measurement, not the first. Measured too early it reports an
+inflated payload and an extra response (StyleX has been seen at 392 KB · 11 instead of its stable
+356 KB · 10), because the first edit lands while Vite is still populating its module graph. If two
+consecutive runs on the same server agree, the number is real.
 
 `hmr-fanout.mjs` is not, and **a single pass over the three engines is not a fair comparison.** The
 machine drifts by more over the ten minutes such a pass takes than the engines differ from each
