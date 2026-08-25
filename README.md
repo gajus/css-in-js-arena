@@ -7,11 +7,11 @@ so the numbers isolate the engine and nothing else.
 
 | Engine | Integration | Version |
 | --- | --- | --- |
-| [Bamboo CSS](https://bamboocss.com) | `@bamboocss/vite` | 1.47.0 |
+| [Bamboo CSS](https://bamboocss.com) | `@bamboocss/vite` | 1.48.0 |
 | [StyleX](https://stylexjs.com) | `@stylexjs/unplugin` | 0.19.0 |
 | [Panda CSS](https://panda-css.com) | `@pandacss/postcss` | 1.12.0 |
 
-Measured 2026-08-24 at the versions above · macOS, Node 24.10, Vite 8.2.1
+Measured 2026-08-25 at the versions above · macOS, Node 24.10, Vite 8.2.1
 
 | Engine | Shipped bytes | Build & dev | Authoring | Correctness & maintenance | Rows won 🏆 |
 | --- | --- | --- | --- | --- | --- |
@@ -43,11 +43,11 @@ survive scale**, as the next section shows.
 | Orphan file in `include` (50 styles), imported by nothing | **+0 B** 🏆 | **+0 B** 🏆 | +13,200 B |
 | Stylesheets emitted | **1** 🏆 | 2 — one unreferenced | **1** 🏆 |
 | **Build & dev** | | | |
-| Production build, cold | **1,691 ms** 🏆 | 2,520 ms | 1,770 ms |
-| Production build, warm | **1,716 ms** 🏆 | 2,542 ms | 1,758 ms |
-| Dev server cold start | 1,807 ms | 1,603 ms | **1,446 ms** 🏆 |
-| HMR — edit a shared style module | 172 ms | **104 ms** 🏆 | 206 ms |
-| HMR — edit a component file | 191 ms | 286 ms | **116 ms** 🏆 |
+| Production build, cold | **1,740 ms** 🏆 | 2,574 ms | 1,931 ms |
+| Production build, warm | **1,746 ms** 🏆 | 2,663 ms | 1,928 ms |
+| Dev server cold start | 1,935 ms | 1,731 ms | **1,668 ms** 🏆 |
+| HMR — edit a shared style module | 159 ms | **102 ms** 🏆 | 196 ms |
+| HMR — edit a component file | 179 ms | 240 ms | **111 ms** 🏆 |
 | HMR payload, one shared edit | **336 KB · 9** 🏆 | 356 KB · 10 | 402 KB · 9 |
 | **Authoring** | | | |
 | Total lines written | **3,921** 🏆 | 4,090 | **3,930** 🏆 |
@@ -215,13 +215,12 @@ Less than anything else in the table.
 Edit-to-browser latency is bimodal for all three engines — runs cluster near ~100 ms and ~200 ms
 rather than around one value — so each median summarises a split distribution rather than a typical
 frame, and what separates the engines is how often each lands in the slow cluster. Sweep to sweep the
-per-engine medians move by 16–25% for Bamboo and 25–29% for StyleX; Panda's component-file median
-swings 102%, three sweeps landing near 110 ms and one near 210 ms.
+per-engine medians move by 2–13% for StyleX, 16–24% for Bamboo and 19–40% for Panda.
 
 The medians shown pool 40 runs per engine gathered over four sweeps in four different engine orders,
 because a single sweep drifts enough over its own runtime to hand whichever engine goes first a
-materially better number. Both winning margins here are 65%, far wider than that residual, so the
-ranking is solid even though the individual figures are not precise.
+materially better number. The two winning margins here are 56% and 61%, far wider than that residual,
+so the ranking is solid even though the individual figures are not precise.
 
 `hmr-fanout.mjs` also cannot isolate an engine's own work from Vite's HMR protocol, React Fast
 Refresh, or the socket round trip. The `HMR payload` row is a different matter — it counts bytes, not
