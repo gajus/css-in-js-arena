@@ -29,6 +29,8 @@ import { ENGINES as engines } from "./engines.mjs";
 const ROOT = new URL("..", import.meta.url).pathname.replace(/\/$/, "");
 const COUNTS = (process.env.COUNTS ?? "0,25,100,400").split(",").map(Number);
 const EDIT_RUNS = Number(process.env.RUNS ?? 7);
+const BUILD_RUNS = Number(process.env.BUILD_RUNS ?? 3);
+const START_RUNS = Number(process.env.START_RUNS ?? 3);
 
 /** Identical in every generated module, so rules dedupe and only files scale. */
 const DECLS = [
@@ -94,8 +96,11 @@ const apply = (engine, dir, n) => {
   return undo;
 };
 
+/** Kill only what is LISTENING on the port. Plain `lsof -ti:<port>` also matches
+ *  this process, which holds a client socket to that port for the edit timing —
+ *  killing that set kills the harness. */
 const freePort = (port) => {
-  try { execFileSync("bash", ["-c", `lsof -ti:${port} | xargs kill -9`], { stdio: "pipe" }); } catch {}
+  try { execFileSync("bash", ["-c", `lsof -ti:${port} -sTCP:LISTEN | xargs kill -9 2>/dev/null`], { stdio: "ignore" }); } catch {}
 };
 
 const buildOnce = (dir) => {
@@ -108,13 +113,15 @@ const buildOnce = (dir) => {
   return { ms: Date.now() - t };
 };
 
-/** Rule blocks in the emitted stylesheet — the audit that rules stayed flat. */
-const blocks = (dir) => {
+/** Raw bytes of every emitted stylesheet — the audit that rules stayed flat.
+ *  If this grows with file count the isolation has failed and the timings are
+ *  measuring rule volume, not per-file cost. */
+const cssBytes = (dir) => {
   const base = join(dir, "build/client/assets");
   if (!existsSync(base)) return null;
   const files = readdirSync(base).filter((x) => x.endsWith(".css"));
   if (!files.length) return null;
-  return files.reduce((n, f) => n + (readFileSync(join(base, f), "utf8").match(/\{/g) ?? []).length, 0);
+  return files.reduce((n, f) => n + readFileSync(join(base, f)).length, 0);
 };
 
 const waitFor = async (port, ms = 90000) => {
@@ -136,7 +143,7 @@ const startDev = async (dir, port) => {
   freePort(port);
   await sleep(400);
   const t = Date.now();
-  execFileSync("bash", ["-c", `cd ${JSON.stringify(dir)} && nohup npm run dev -- --port ${port} > /dev/null 2>&1 &`], { stdio: "pipe" });
+  execFileSync("bash", ["-c", `cd ${JSON.stringify(dir)} && nohup npm run dev -- --port ${port} > /dev/null 2>&1 &`], { stdio: "ignore" });
   const ok = await waitFor(port);
   return { startMs: ok == null ? null : Date.now() - t };
 };
@@ -186,25 +193,41 @@ for (const eng of engines) {
   results[eng.name] = [];
   for (const n of COUNTS) {
     const undo = apply(eng.name, dir, n);
+    process.stderr.write(`  … ${eng.name} n=${n}: building\n`);
     try {
-      const b = buildOnce(dir);
+      const buildTimes = [];
+      let b = { ms: null };
+      for (let k = 0; k < BUILD_RUNS; k++) { b = buildOnce(dir); if (b.ms == null) break; buildTimes.push(b.ms); }
       if (b.ms == null) {
         console.log(`  ${eng.name} n=${n} BUILD FAILED`);
         results[eng.name].push({ n, failed: true });
         continue;
       }
-      const blk = blocks(dir);
-      const { startMs } = await startDev(dir, eng.devPort);
+      const cssB = cssBytes(dir);
+      process.stderr.write(`  … ${eng.name} n=${n}: dev server\n`);
+      const startTimes = [];
+      let startMs = null;
+      for (let k = 0; k < START_RUNS; k++) {
+        const r = await startDev(dir, eng.devPort);
+        startMs = r.startMs;
+        if (startMs != null) startTimes.push(startMs);
+        if (k < START_RUNS - 1) { freePort(eng.devPort); await sleep(900); }
+      }
       let edit = { times: [] };
       if (startMs != null) {
+        process.stderr.write(`  … ${eng.name} n=${n}: timing edits\n`);
         await sleep(9000); // let the module graph settle before timing edits
         edit = await editLatency(dir, eng.devPort, eng.name, EDIT_RUNS);
       }
       freePort(eng.devPort);
       await sleep(1200);
 
-      results[eng.name].push({ n, build: b.ms, blocks: blk, start: startMs, edit: median(edit.times), edits: edit.times });
-      console.log(`  ${eng.name} n=${n} ok  build ${b.ms}ms  start ${startMs}ms  edit ${median(edit.times)}ms  blocks ${blk}`);
+      results[eng.name].push({
+        n, build: median(buildTimes), builds: buildTimes, cssB,
+        start: median(startTimes), starts: startTimes,
+        edit: median(edit.times), edits: edit.times,
+      });
+      console.log(`  ${eng.name} n=${n} ok  build ${median(buildTimes)}ms  start ${median(startTimes)}ms  edit ${median(edit.times)}ms  css ${cssB}B`);
     } finally {
       undo();
     }
@@ -223,10 +246,10 @@ console.log(`  edit→ws is the dev server's own reaction, over a bare websocket
 
 for (const name of Object.keys(results)) {
   console.log(`${name}:`);
-  console.log(`    ${pad("files", 7)}${pad("build ms", 11)}${pad("dev start", 11)}${pad("edit→ws", 10)}${pad("blocks", 9)}`);
+  console.log(`    ${pad("files", 7)}${pad("build ms", 11)}${pad("dev start", 11)}${pad("edit→ws", 10)}${pad("css B", 10)}`);
   for (const r of results[name]) {
     if (r.failed) { console.log(`    ${pad(r.n, 7)}  BUILD FAILED`); continue; }
-    console.log(`    ${pad(r.n, 7)}${pad(r.build, 11)}${pad(r.start, 11)}${pad(r.edit, 10)}${pad(r.blocks, 9)}`);
+    console.log(`    ${pad(r.n, 7)}${pad(r.build, 11)}${pad(r.start, 11)}${pad(r.edit, 10)}${pad(r.cssB, 10)}`);
   }
   const a = results[name].find((r) => r.n === COUNTS[0] && !r.failed);
   const z = results[name].find((r) => r.n === COUNTS.at(-1) && !r.failed);

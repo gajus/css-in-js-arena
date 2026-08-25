@@ -1,9 +1,8 @@
 # CSS-in-JS Arena
 
-A benchmark harness for **compile-time CSS engines**. Each engine gets its own React Router 8 app
-under `apps/`, and every app renders the *same* six-page admin console — identical markup,
-identical design, identical data. The apps are verified pixel-identical before anything is measured,
-so the numbers isolate the engine and nothing else.
+Benchmark harness for **compile-time CSS engines**. Each engine gets its own React Router 8 app under
+`apps/`, all rendering the same six-page admin console: identical markup, design and data, verified
+pixel-identical before anything is measured.
 
 | Engine | Integration | Version |
 | --- | --- | --- |
@@ -11,17 +10,16 @@ so the numbers isolate the engine and nothing else.
 | [StyleX](https://stylexjs.com) | `@stylexjs/unplugin` | 0.19.0 |
 | [Panda CSS](https://panda-css.com) | `@pandacss/postcss` | 1.12.0 |
 
-Measured 2026-08-25 at the versions above · macOS, Node 24.10, Vite 8.2.1
+Measured 2026-08-25 · macOS, Node 24.10, Vite 8.2.1
 
 | Engine | Shipped bytes | Build & dev | Authoring | Correctness & maintenance | Rows won 🏆 |
 | --- | --- | --- | --- | --- | --- |
-| **Bamboo** 🏆 | **9** / 10 🏆 | **3** / 6 🏆 | **7** / 8 🏆 | **4** / 4 🏆 | **23** / 28 🏆 |
-| StyleX | 5 / 10 | 1 / 6 | 2 / 8 | 1 / 4 | 9 / 28 |
-| Panda | 2 / 10 | 2 / 6 | 6 / 8 | 1 / 4 | 11 / 28 |
+| **Bamboo** 🏆 | **9** / 10 🏆 | 3 / 8 | **7** / 8 🏆 | **4** / 4 🏆 | **23** / 30 🏆 |
+| StyleX | 5 / 10 | 1 / 8 | 2 / 8 | 1 / 4 | 9 / 30 |
+| Panda | 2 / 10 | **5** / 8 🏆 | 6 / 8 | 1 / 4 | 14 / 30 |
 
-Rows won per category, out of the scored rows in each. They are not equally weighted and two are
-unscored, so the tally is a scanning aid rather than the judgement — and **the byte margins do not
-survive scale**, as the next section shows.
+Axes are not equally weighted and two are unscored, so the tally is a scanning aid, not the
+judgement. **Neither the byte nor the build margins survive scale.**
 
 ---
 
@@ -34,20 +32,22 @@ survive scale**, as the next section shows.
 | CSS, brotli | **6,825 B** 🏆 | 7,008 B | 9,518 B |
 | CSS, gzip | **7,909 B** 🏆 | 8,176 B | 11,524 B |
 | CSS, raw | **37,326 B** 🏆 | 40,430 B | 54,007 B |
-| CSS rules emitted — *not a quality axis* | 525 | 467 | 532 |
+| CSS rules emitted *(not a quality axis)* | 525 | 467 | 532 |
 | Client JS, brotli | **92,569 B** 🏆 | **93,583 B** 🏆 | 97,778 B |
-| SSR HTML, gzip (mean of 6) — *tie, spread 0.3%* | 5,544 B | 5,526 B | 5,544 B |
+| SSR HTML, gzip, mean of 6 *(tie, spread 0.3%)* | 5,544 B | 5,526 B | 5,544 B |
 | Class attribute bytes, raw | 93,036 B | **70,843 B** 🏆 | 92,738 B |
-| — on the selector-heavy route | **11,728 B** 🏆 | **11,754 B** 🏆 | **11,685 B** 🏆 |
-| Unreachable CSS shipped | **0 B** 🏆 | 344 B | n/a — runtime |
+| Class attribute bytes, selector-heavy route | **11,728 B** 🏆 | **11,754 B** 🏆 | **11,685 B** 🏆 |
+| Unreachable CSS shipped | **0 B** 🏆 | 344 B | n/a (runtime) |
 | Orphan file in `include` (50 styles), imported by nothing | **+0 B** 🏆 | **+0 B** 🏆 | +13,200 B |
-| Stylesheets emitted | **1** 🏆 | 2 — one unreferenced | **1** 🏆 |
+| Stylesheets emitted | **1** 🏆 | 2 (one unreferenced) | **1** 🏆 |
 | **Build & dev** | | | |
-| Production build, cold | **1,499 ms** 🏆 | 2,338 ms | 1,720 ms |
-| Production build, warm | **1,494 ms** 🏆 | 2,347 ms | 1,705 ms |
-| Dev server cold start | 1,642 ms | 1,452 ms | **1,341 ms** 🏆 |
-| HMR — edit a shared style module | 144 ms | **102 ms** 🏆 | 128 ms |
-| HMR — edit a component file | 192 ms | 231 ms | **110 ms** 🏆 |
+| Production build, cold | **1,543 ms** 🏆 | 2,301 ms | 1,688 ms |
+| Production build, warm | **1,540 ms** 🏆 | 2,322 ms | 1,673 ms |
+| Dev server cold start | 1,607 ms | 1,445 ms | **1,323 ms** 🏆 |
+| Shared edit → server reacts | 123 ms (bimodal) | **51 ms** 🏆 | **51 ms** 🏆 |
+| Shared edit → correct paint | 186 ms | 199 ms | **145 ms** 🏆 |
+| Component edit → server reacts | 135 ms (bimodal) | 76 ms | **50 ms** 🏆 |
+| Component edit → correct paint | 138 ms | 254 ms | **113 ms** 🏆 |
 | HMR payload, one shared edit | **336 KB · 9** 🏆 | 356 KB · 10 | 402 KB · 9 |
 | **Authoring** | | | |
 | Total lines written | **3,921** 🏆 | 4,090 | **3,930** 🏆 |
@@ -55,43 +55,36 @@ survive scale**, as the next section shows.
 | Next-sibling selector (`+`) | **yes** 🏆 | `~` only, via `when` + a marker | **yes** 🏆 |
 | Variant recipes | **`cva`, typed matrix** 🏆 | compose per call site | **`cva`, typed matrix** 🏆 |
 | Light/dark theming | **2 values per token** 🏆 | 3 values per token | 4 values per token |
-| Dynamic values | inline `style` | **custom property** 🏆 — survives the cascade | inline `style` |
+| Dynamic values | inline `style` | **custom property** 🏆 (survives the cascade) | inline `style` |
 | Register an `@property` (not via `globalCss`) | **`global.vars`** 🏆 | **`stylex.types.*`** 🏆 | **`globalVars`** 🏆 |
-| Animate a registered property | **yes** 🏆 | declaration dropped — no keyframe, no rule | **yes** 🏆 |
+| Animate a registered property | **yes** 🏆 | declaration dropped, no keyframe or rule | **yes** 🏆 |
 | **Correctness & maintenance** | | | |
 | Mistyped token name | **build fails** 🏆 | TS error, build succeeds | not caught at all |
 | Mistyped property name | **caught** (TS2561) 🏆 | ships `pading-block` | **caught** (TS2561) 🏆 |
 | Delete a page → CSS shrinks | **−20.0%** 🏆 | −8.4% | −13.5% |
-| Class names folded to literals | **522 / 522** 🏆 | **453 / 458** 🏆 | 25 / 529 — rest computed in the browser, from a 14.7 KB runtime chunk |
+| Class names folded to literals | **522 / 522** 🏆 | **453 / 458** 🏆 | 25 / 529 (rest computed in browser, 14.7 KB runtime chunk) |
 | | | | |
-| **Rows won**, of 28 scored 🏆 | **23** | **9** | **11** |
+| **Rows won**, of 30 scored 🏆 | **23** | **9** | **14** |
 
 ---
 
 ## Where the main table doesn't generalise
 
-Everything above is one app in one configuration. Two things move the answer: how many styles the app
-has, and whether it ships more than light and dark.
+One app, one configuration. Three things move the answer: style count, file count, theme count.
 
 ### Style volume
 
-The main table describes an app of 570 rule blocks. Real applications run an order of magnitude past
-that, where fixed overhead stops mattering and marginal cost per rule becomes everything.
-
-`tools/scale.mjs` generates *N* style definitions with all-distinct values and measures the emitted
-stylesheet, isolating each engine's true cost per rule.
+The arena is 570 rule blocks. `tools/scale.mjs` generates *N* all-distinct style definitions and
+measures the emitted stylesheet.
 
 **Downloaded stylesheet, brotli, relative to Bamboo:**
 
 | Style definitions | Bamboo | StyleX | Panda |
 | --- | --- | --- | --- |
-| 0 — the app as it ships | ref | +2.7% | +39.5% |
+| 0 (as shipped) | ref | +2.7% | +39.5% |
 | 50 | ref | +17.7% | +35.0% |
 | 200 | ref | +49.4% | +27.3% |
 | 800 | ref | **+101.5%** | **+15.5%** |
-
-Both challengers move, in opposite directions. **The ranking at the arena's size is not the ranking
-at production size.**
 
 | | Marginal cost per declaration | Gap to Bamboo at n=0 | at n=800 |
 | --- | --- | --- | --- |
@@ -99,18 +92,42 @@ at production size.**
 | Panda | 40.3 B raw · 2.0 B brotli | +16,681 B | +16,681 B |
 | StyleX | 65.8 B raw · 5.5 B brotli | +3,104 B | +125,503 B |
 
-**Panda's marginal cost is identical to Bamboo's, to the byte.** Its whole penalty is a fixed
-16,681 B of scaffolding — the same constant at 0 styles and at 800 — so "Panda ships 40% more CSS" is
-a statement about a small app, not about Panda. StyleX is the reverse: almost pure slope, growing 40×
-across the same range, because every rule carries `:not(#\#)` specificity padding that repeats per
-declaration and compresses poorly.
+**The ranking at the arena's size is not the ranking at production size.** Panda's marginal cost
+equals Bamboo's to the byte; its whole penalty is a fixed 16,681 B of scaffolding, identical at 0
+styles and at 800. StyleX is the reverse, almost pure slope: every rule carries `:not(#\#)`
+specificity padding that repeats per declaration and compresses badly.
+
+### Dev loop and app size
+
+`tools/dev-scale.mjs` adds *N* generated source files and re-measures. Every module carries identical
+declarations, so they fold to the same classes and the stylesheet stays flat (Bamboo 37,326 →
+37,494 B). Only file count grows.
+
+**Edit → HMR broadcast, ms:**
+
+| Extra source files | Bamboo | StyleX | Panda |
+| --- | --- | --- | --- |
+| 0 (as shipped) | 124 | 50 | 51 |
+| 25 | 123 | 51 | 50 |
+| 100 | 123 | 51 | 51 |
+| 400 | 111 | 51 | 51 |
+
+**Per-edit cost is flat in file count for all three.** None re-reads the source inventory to answer an
+edit, so Bamboo's gap is a fixed ~2.4×, not a scaling one. Whole-inventory work is not flat:
+
+| | Bamboo | StyleX | Panda |
+| --- | --- | --- | --- |
+| Production build, 0 → 400 files | 1,484 → 2,092 ms (**+41%**) | 2,426 → 2,884 ms (+19%) | 1,785 → 1,954 ms (**+9%**) |
+| Dev server cold start, 0 → 400 files | 1,644 → 2,354 ms (**+43%**) | 1,498 → 2,093 ms (+40%) | 1,471 → 1,675 ms (**+14%**) |
+
+Bamboo wins both rows outright in the main table and loses both slopes here. Panda is flattest in file
+count as in rule count.
 
 ### Theming
 
-Brand themes are a different question from light/dark, and the arena app ships none — so this is
-measured separately. `tools/theming.mjs` injects *N* themes through each engine's own multi-theme API
-(Bamboo `theme.variants`, Panda `themes`, StyleX `createTheme`), each overriding the same 18 colours
-with a light and a dark value.
+The arena ships no brand themes. `tools/theming.mjs` injects *N* through each engine's own multi-theme
+API (Bamboo `theme.variants`, Panda `themes`, StyleX `createTheme`), each overriding the same 18
+colours light and dark.
 
 **Stylesheet the browser downloads, brotli:**
 
@@ -125,18 +142,16 @@ with a light and a dark value.
 
 | Axis | Bamboo | StyleX | Panda | Margin |
 | --- | --- | --- | --- | --- |
-| Bytes per theme | **1,374 B** 🏆 | n/a — in the stylesheet | 2,805 B | −51% |
+| Bytes per theme | **1,374 B** 🏆 | n/a (in the stylesheet) | 2,805 B | −51% |
 | Themes in the critical path | **none** 🏆 | all of them | **none** 🏆 | StyleX has no lazy option |
 
-Two mechanisms, not three. Bamboo and Panda emit each theme as its own artifact, imported on demand,
-so first load is flat however many exist. StyleX's `createTheme` compiles into the linked stylesheet,
-so every visitor pays for every theme — at eight, its CSS is **19% larger** than at zero. Between the
-two lazy engines the gap is the same encoding difference as the light/dark row: Bamboo writes `base`
-and `_osDark` and lets `light-dark()` resolve the rest, Panda writes four values. That is **2.04× the
-bytes per theme**.
-
-This reverses for a site that ships one fixed brand theme and never switches: a lazy artifact is then
-a second request for bytes the stylesheet would have carried anyway.
+Two mechanisms, not three. Bamboo and Panda emit each theme as its own artifact loaded on demand, so
+first load is flat however many exist. StyleX's `createTheme` compiles into the linked stylesheet, so
+every visitor pays for every theme: at eight, its CSS is **19% larger** than at zero. Between the lazy
+two it is the light/dark encoding again, Bamboo writing `base` and `_osDark` and letting
+`light-dark()` resolve the rest against Panda's four values, **2.04× the bytes per theme**. For a site
+with one fixed brand theme this reverses: a lazy artifact is a second request for bytes the stylesheet
+would have carried anyway.
 
 ---
 
@@ -144,18 +159,16 @@ a second request for bytes the stylesheet would have carried anyway.
 
 ### Ground rules
 
-- **One reference app.** `apps/bamboo` is the reference; every other is diffed against it, so all
-  match each other transitively — element for element, then pixel for pixel.
+- **One reference app.** `apps/bamboo` is the reference. Every other is diffed against it element for
+  element, then pixel for pixel, so all match each other transitively.
 - **Shared source is byte-identical.** `data.ts`, `icons.tsx` and `chart-utils.ts` are the same bytes
   in every app.
-- **Same baseline reset.** Engines that ship one use theirs; engines that do not vendor Bamboo's
+- **Same baseline reset.** Engines shipping one use theirs. Engines that do not vendor Bamboo's
   `preflight` verbatim, so nobody gets a typography head start.
-- **Default configuration only.** Each engine is measured as it ships. Opt-in settings are reported
-  separately, never folded into the main table.
+- **Default configuration only.** Opt-in settings are reported separately, never folded into the main
+  table.
 
 ### Pages
-
-Every app renders these six routes identically:
 
 | Route | What it exercises |
 | --- | --- |
@@ -166,15 +179,14 @@ Every app renders these six routes identically:
 | `/docs` | 3-column docs layout, prose typography, code block, callouts, table, TOC |
 | `/lab` | Structural + relational selectors, keyframe motion, container queries |
 
-All six are responsive across three breakpoints and support system dark mode plus an explicit
-light/dark toggle.
+All six are responsive across three breakpoints and support system dark mode plus an explicit toggle.
 
 ---
 
 ## Reproducing this
 
-Every number here comes from one contiguous measurement session on one machine. The harness, the
-parity gate and the exact commands are in **[`RUNNING.md`](./RUNNING.md)**.
+Every number comes from one contiguous session on one machine. Harness, parity gate and exact commands
+are in **[`RUNNING.md`](./RUNNING.md)**.
 
 ---
 
@@ -183,50 +195,53 @@ parity gate and the exact commands are in **[`RUNNING.md`](./RUNNING.md)**.
 <details>
 <summary><strong>Why is CSS minification disabled?</strong></summary>
 
-`build.cssMinify: false` in all three apps. Vite's default runs Lightning CSS over the emitted
-stylesheet and rewrites it — most visibly downlevelling `light-dark()` into a 54-variable polyfill
-under the `baseline-widely-available` target. That measures the downleveller rather than the engine,
-and penalises only engines emitting modern CSS. With it off, every stylesheet measured here is
-exactly what its engine wrote.
+`build.cssMinify: false` in all three apps. Vite's default runs Lightning CSS over the stylesheet and
+rewrites it, most visibly downlevelling `light-dark()` into a 54-variable polyfill under the
+`baseline-widely-available` target. That measures the downleveller, and penalises only engines
+emitting modern CSS. Off, every stylesheet here is what its engine wrote.
 
-StyleX still shows some Lightning CSS output because `@stylexjs/unplugin` depends on it directly —
-that is part of its product, not the harness.
-
-</details>
-
-<details>
-<summary><strong>What does the orphan-file row actually measure?</strong></summary>
-
-A module that matches the engine's `include` glob but that nothing imports — the file a deleted
-feature leaves behind. `tools/orphan.mjs` writes one carrying 50 style definitions, rebuilds, and
-diffs the stylesheet.
-
-Panda extracts from source text, so it scans the file and ships its CSS regardless of whether the
-bundle reaches it. Bamboo and StyleX both scope to the bundle graph and emit nothing. The 13,200 B
-is a property of the fixture; the finding is which engines are at zero.
+StyleX still shows Lightning CSS output because `@stylexjs/unplugin` depends on it directly. That is
+its product, not the harness.
 
 </details>
 
 <details>
-<summary><strong>How much weight do the two HMR latency rows carry?</strong></summary>
+<summary><strong>What does the orphan-file row measure?</strong></summary>
 
-Less than anything else in the table.
+A module matching the engine's `include` glob that nothing imports: the file a deleted feature leaves
+behind. `tools/orphan.mjs` writes one carrying 50 style definitions, rebuilds, and diffs the
+stylesheet.
 
-Edit-to-browser latency is bimodal for all three engines — runs cluster near ~100 ms and ~200 ms
-rather than around one value — so each median summarises a split distribution rather than a typical
-frame, and what separates the engines is how often each lands in the slow cluster. Sweep to sweep the
-per-engine medians move by 6–11% for StyleX, 30–40% for Bamboo and 18–88% for Panda — Panda's
-shared-module figure is the least settled number in the table, its sweeps splitting between roughly
-110 ms and 190 ms.
+Panda extracts from source text, so it ships the CSS whether or not the bundle reaches the file.
+Bamboo and StyleX scope to the bundle graph and emit nothing. The 13,200 B is a property of the
+fixture; the finding is which engines are at zero.
 
-The medians shown pool 60 runs per engine gathered over six sweeps in six different engine orders,
-because a single sweep drifts enough over its own runtime to hand whichever engine goes first a
-materially better number. The component-file margin, 74%, is far wider than that residual. The
-shared-module margin is only 25%, narrower than Panda's own sweep spread — but StyleX repeats to
-within 6% and its slowest sweep still beats Panda's fastest, so that ranking holds too.
+</details>
 
-`hmr-fanout.mjs` also cannot isolate an engine's own work from Vite's HMR protocol, React Fast
-Refresh, or the socket round trip. The `HMR payload` row is a different matter — it counts bytes, not
-milliseconds, and reproduces exactly.
+<details>
+<summary><strong>Why is the HMR edit four rows instead of one?</strong></summary>
+
+Because one number measured the wrong event, in a way that changed the ranking. The old probe polled
+`getComputedStyle` until it differed from the previous value. `tools/hmr-trace.mjs` shows two faults:
+
+**It fires on a flash.** The first value seen is an inherited fallback, `15px`, in every run for every
+engine. The written value arrives 57–61 ms later on the shared edit.
+
+**It is not the same event across engines.** An edit produces two signals, the CSS going live and the
+JS module re-executing, and the poll catches whichever is first. StyleX lands CSS after its JS, Bamboo
+and Panda before it.
+
+Correcting both reverses the row. To correct paint the shared edit is Panda 145 ms, Bamboo 186 ms,
+StyleX 199 ms, where the old probe had StyleX fastest by 40%.
+
+Of the four rows only **server reacts** (write to HMR broadcast) is attributable to the engine alone.
+Everything later includes Vite's protocol, React Fast Refresh and the socket round trip. **Correct
+paint** is end to end.
+
+Bamboo's server reaction is marked bimodal because it is: about a third of runs near 35 ms, the rest
+near 125 ms. Small samples invent trends, so a 7-run median suggested its cost grew with file count
+where 15 runs per point showed it flat.
+
+`HMR payload` counts bytes, not milliseconds, and reproduces exactly.
 
 </details>

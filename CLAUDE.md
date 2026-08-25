@@ -126,27 +126,45 @@ node authoring.mjs    # lines of styling code
 node orphan.mjs       # a module matching `include` that nothing imports
 node theming.mjs      # cost of N brand themes — reported separately, not in the main table
 node scale.mjs        # marginal cost per rule at 0/50/200/800 styles — reported separately
+node dev-scale.mjs    # dev loop cost at 0/25/100/400 extra files — reported separately
 ```
 
-### 6. Measure HMR — one dev server at a time
-
-Run these **sequentially**, never concurrently.
+### 6. Measure HMR
 
 ```bash
-cd apps/bamboo && npm run dev -- --port 4001 &
-cd tools && node hmr-fanout.mjs bamboo 4001 10  # shared style module vs component file
-node hmr-payload.mjs bamboo 4001                # what the browser refetches
-# kill it, then repeat for the next engine on 4002, 4003, …
+cd tools && node hmr-phases.mjs 4 5
 ```
 
-`hmr-fanout.mjs` needs **two passes with the engine order reversed** (bamboo→stylex→panda, then
-panda→stylex→bamboo), pooled before taking the median. A single pass drifts more over its own
-runtime than the engines differ from each other, so it silently rewards whichever engine ran first —
-a 25-run single pass is *worse* than 2×10 reversed, because it buys precision inside one drift
-window without correcting for the window. See `RUNNING.md` for the full note.
+One driver. It starts and stops every dev server itself, reverses the engine order on alternate
+sweeps, and pools the result — do not drive servers by hand and do not run anything else meanwhile.
+Budget ~25 minutes.
+
+It reports **phases**, not one end-to-end number, because one number was measuring the wrong event.
+The probe this replaced polled `getComputedStyle` until it differed from the previous value, and
+that is wrong twice:
+
+- the first change it sees is an **inherited fallback**, tens of ms before the written value paints;
+- whichever of the CSS and JS signals lands first is what it catches, and **that order is
+  engine-dependent**, so the columns were not comparing the same event between engines.
+
+Both faults stay visible in the tool's own `(flash → correct)` and `which signal lands last` rows —
+keep them, they are the audit that the axis is still measuring what it claims.
+
+Only `write → ws` is attributable to the engine alone. It comes from a bare `vite-hmr` websocket
+with no browser attached; taken through the trace it moves 3–10× sweep to sweep. **Bamboo's is
+bimodal** — about a third of runs near 35 ms, the rest near 125 ms — so pool at least 20 runs before
+reading it. A 7-run median lands wherever the cluster mix falls and will invent a trend that is not
+there.
+
+`hmr-payload.mjs` is still driven by hand against a server you start, and still wants ~10s of warm-up
+and the second measurement rather than the first.
 
 Note: the dev server binds IPv6 `localhost` only. `127.0.0.1` refuses the connection — the
 production server does not have this problem.
+
+Kill dev servers with `lsof -ti:<port> -sTCP:LISTEN`. Without `-sTCP:LISTEN` the set also contains
+the measuring process, which holds a client socket to that port, and `kill -9` takes the harness
+down mid-run.
 
 ### 7. Write the table back into README.md
 
@@ -176,9 +194,16 @@ Three categories, all under `tools/`:
 - **Add a row to `tools/engines.json`** — name, `port`, `devPort`. That is the single source of
   truth. `bytes.mjs`, `unused.mjs`, `authoring.mjs`, `compare.mjs` and `layout-diff.mjs` read it via
   `engines.mjs`; the shell scripts read the JSON directly. Nothing else needs the list.
-- **Add a per-engine edit anchor** — `hmr.mjs`, `hmr-fanout.mjs`, `hmr-payload.mjs` each keep a map
-  of "which file and which exact string to edit" to trigger a style change. Needs one entry per
-  engine, pointing at an equivalent shared style module and component file.
+- **Add a per-engine edit anchor** — `tools/hmr-anchors.mjs` is the single source of truth for
+  "which file and which exact string to edit", shared by `hmr-trace.mjs` and `hmr-phases.mjs`. One
+  entry per engine, pointing at an equivalent shared style module and component file. The older
+  `hmr.mjs`, `hmr-fanout.mjs` and `hmr-payload.mjs` still keep their own maps and need their own
+  entries if you use them.
+- **Add a per-engine module generator** — `dev-scale.mjs` writes N source files carrying *identical*
+  declarations, so file count scales while rule count does not. Needs an entry in its `generated` map
+  and in `EDIT`. It also asserts the isolation held by reporting emitted CSS bytes per size: if that
+  column grows with file count the generator has started varying rules and the timings mean something
+  else.
 - **Add a per-engine style generator** — `scale.mjs` and `orphan.mjs` write N distinct style
   definitions in that engine's syntax and each needs an entry in its `generated` map. `scale.mjs`
   imports the generated module, because StyleX only sees modules in the bundle graph and the
@@ -246,6 +271,7 @@ grep -rnw "acent\|padingBlock" apps/*/app/ui.ts   # must return nothing (-w: "ad
 grep -rn "tools/theming.mjs" apps/*/app/          # generated themes must be gone
 ls apps/*/app/__scale.ts 2>/dev/null                # scale.mjs module must be gone
 ls apps/*/app/__orphan.ts 2>/dev/null               # orphan.mjs module must be gone
+ls -d apps/*/app/__devscale 2>/dev/null             # dev-scale.mjs module tree must be gone
 find apps/*/styled-system/themes -type f          # no leftover theme artifacts
 ```
 

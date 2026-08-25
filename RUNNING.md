@@ -90,41 +90,66 @@ node authoring.mjs    # lines of styling code
 node orphan.mjs       # a module matching `include` that nothing imports
 ```
 
-## Measure HMR — one dev server at a time
-
-Run these **sequentially, never concurrently** — parallel dev servers skew every timing.
+## Measure HMR — one driver, one dev server at a time
 
 ```bash
-cd apps/bamboo && npm run dev -- --port 4001 &
 cd tools
-node hmr-fanout.mjs bamboo 4001 10   # shared style module vs component file
-node hmr-payload.mjs bamboo 4001     # what the browser refetches
-# kill it, then repeat for the next engine on 4002, 4003
+node hmr-phases.mjs 4 5      # 4 sweeps × 5 pairs, every engine, both edit kinds
 ```
 
-`hmr-payload.mjs` is deterministic **once the dev server has finished warming** — give it ~10s after
-the port answers, and take the second measurement, not the first. Measured too early it reports an
-inflated payload and an extra response (StyleX has been seen at 392 KB · 11 instead of its stable
-356 KB · 10), because the first edit lands while Vite is still populating its module graph. If two
-consecutive runs on the same server agree, the number is real.
+`hmr-phases.mjs` starts and stops each dev server itself, reverses the engine order on alternate
+sweeps, and pools the result — you do not drive the servers by hand. Budget ~25 minutes.
 
-`hmr-fanout.mjs` is not, and **a single pass over the three engines is not a fair comparison.** The
-machine drifts by more over the ten minutes such a pass takes than the engines differ from each
-other, so whichever engine runs first gets a materially better number. Run the sweep twice with the
-engine order reversed in the second pass and pool the runs before taking a median:
+It reports the edit as **phases**, not one number, because one number was measuring the wrong thing:
+
+| phase | what it is |
+| --- | --- |
+| `write → ws` | the dev server's own reaction, up to the HMR broadcast. The only phase attributable to the engine alone. |
+| `write → rule live` | the new rule is live in the document |
+| `write → JS re-executed` | the edited module re-ran and React re-rendered |
+| `write → correct paint` | the target computes the value that was written — true end to end |
+
+The two rows this replaced polled `getComputedStyle` until it differed from the previous value. That
+is wrong twice over, and both are visible in the tool's own output:
+
+- The first change it sees is an **inherited fallback**, not the written value — a flash. The
+  `(flash → correct)` row is how far ahead of the real paint that fires; it has been 57–61 ms on the
+  shared edit.
+- Whichever of the CSS and JS signals lands first is what such a poll catches, and **the order is
+  engine-dependent** — the `which signal lands last` row. So the old columns were not comparing the
+  same event between engines, which is why that row needed 60 runs and still landed with margins
+  narrower than its own spreads.
+
+`write → ws` comes from a bare `vite-hmr` websocket with no browser attached. Taken through the
+trace instead — browser open, CDP poll running — the same figure moves 3–10× sweep to sweep, so the
+tool measures it separately and reports the socket number.
+
+**Bamboo's `write → ws` is bimodal**: roughly a third of runs land near 35 ms and the rest near
+125 ms. Pool at least 20 runs per engine before reading it, and do not treat a 7-run median as
+settled — a small sample lands wherever the cluster mix happens to fall.
 
 ```bash
-# pass 1: bamboo → stylex → panda      (10 runs each)
-# pass 2: panda → stylex → bamboo      (10 runs each)
+node hmr-payload.mjs bamboo 4001     # bytes the browser refetches — needs a server you started
 ```
 
-Pooling 2×10 that way beats a single 25-run pass, which buys precision inside one drift window
-without correcting for the window itself. Distributions here are bimodal — clusters near ~100 ms and
-~200 ms — so also sanity-check that the two passes agree per engine before trusting the pooled
-median; if one engine's two passes disagree by more than the gap you are reporting, measure again.
+`hmr-payload.mjs` still wants a dev server you start yourself, and is deterministic **once it has
+finished warming** — give it ~10s after the port answers and take the second measurement, not the
+first. Measured too early it reports an inflated payload and an extra response (StyleX has been seen
+at 392 KB · 11 instead of its stable 356 KB · 10). If two consecutive runs agree, the number is real.
+
+`hmr-trace.mjs` is the underlying instrument and can be run directly on one engine for the full
+per-run detail — every websocket message, every module refetch, head mutations:
+
+```bash
+node hmr-trace.mjs bamboo 4001 shared 6
+```
 
 The dev server binds IPv6 `localhost` only — `127.0.0.1` refuses the connection. The production
 server does not have this problem.
+
+Both tools kill dev servers with `lsof -ti:<port> -sTCP:LISTEN`. The `-sTCP:LISTEN` is load-bearing:
+a plain `lsof -ti:<port>` also matches the measuring process, which holds a client socket to that
+port, so `kill -9` on that set kills the harness mid-run.
 
 ## The separate scenarios
 
@@ -135,9 +160,11 @@ they are not the default configuration:
 cd tools
 node scale.mjs     # marginal cost per rule at 0 / 50 / 200 / 800 style definitions
 node theming.mjs   # cost of 0 / 1 / 2 / 4 / 8 brand themes, per engine's own API
+node dev-scale.mjs # dev loop cost at 0 / 25 / 100 / 400 extra source files
 ```
 
-Both rewrite app sources, build, and restore. They take a few minutes each.
+All three rewrite app sources, build, and restore. They take several minutes each; dev-scale is the
+longest, since it boots a dev server at every size.
 
 ## Interpreting timings
 
@@ -149,12 +176,13 @@ Timing rows are the noisiest thing here and the easiest to misread:
   the two versions interleaved with the order reversed in the second half so a monotonic drift
   cancels. Absolute values from two such pairs are comparable only *within* a pair, never between.
   A session-over-session diff is not evidence: `README.md` records a point in time, not a trend.
-- `hmr-fanout.mjs` measures edit-to-browser latency, not transform time. It cannot isolate an
-  engine's own work from Vite's HMR protocol, React Fast Refresh, or the socket round trip.
+- Only `write → ws` is the engine's own work. Every later phase includes Vite's HMR protocol, React
+  Fast Refresh and the socket round trip, which no phase boundary can separate out.
 
 ## Probe hygiene
 
-`typesafety.sh`, `scale.mjs`, `theming.mjs`, `orphan.mjs` and the ad-hoc probes deliberately
+`typesafety.sh`, `scale.mjs`, `theming.mjs`, `orphan.mjs`, `dev-scale.mjs` and the ad-hoc probes
+deliberately
 introduce typos, inject themes and flip config flags. They restore afterwards, but confirm before you
 trust a result:
 

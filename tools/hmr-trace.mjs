@@ -30,6 +30,7 @@
 //   → correct          the target computes the value that was written
 import { readFileSync, writeFileSync } from "node:fs";
 import { chromium } from "playwright";
+import { CASES } from "./hmr-anchors.mjs";
 
 const app = process.argv[2];
 const port = Number(process.argv[3]);
@@ -41,51 +42,6 @@ const MODE = process.argv[6] ?? "interleaved";
 const ROOT = new URL("../", import.meta.url).pathname;
 
 // Same anchors and same first value as hmr-fanout.mjs, so run 0 is its edit.
-const CASES = {
-  bamboo: {
-    leaf: {
-      file: `${ROOT}apps/bamboo/app/routes/dashboard.tsx`,
-      from: `  kpiValue: css({\n    fontSize: "23px",`,
-      mk: (v) => `  kpiValue: css({\n    fontSize: "${v}px",`,
-      base: 23, first: 31, sel: "article span + span",
-    },
-    shared: {
-      file: `${ROOT}apps/bamboo/app/ui.ts`,
-      from: `export const pageTitle = css({ fontSize: "25px"`,
-      mk: (v) => `export const pageTitle = css({ fontSize: "${v}px"`,
-      base: 25, first: 41, sel: "h1",
-    },
-  },
-  panda: {
-    leaf: {
-      file: `${ROOT}apps/panda/app/routes/dashboard.tsx`,
-      from: `  kpiValue: css({\n    fontSize: "23px",`,
-      mk: (v) => `  kpiValue: css({\n    fontSize: "${v}px",`,
-      base: 23, first: 31, sel: "article span + span",
-    },
-    shared: {
-      file: `${ROOT}apps/panda/app/ui.ts`,
-      from: `export const pageTitle = css({ fontSize: "25px"`,
-      mk: (v) => `export const pageTitle = css({ fontSize: "${v}px"`,
-      base: 25, first: 41, sel: "h1",
-    },
-  },
-  stylex: {
-    leaf: {
-      file: `${ROOT}apps/stylex/app/routes/dashboard.tsx`,
-      from: `  kpiValue: {\n    fontSize: 23,`,
-      mk: (v) => `  kpiValue: {\n    fontSize: ${v},`,
-      base: 23, first: 31, sel: "article span + span",
-    },
-    shared: {
-      file: `${ROOT}apps/stylex/app/ui.ts`,
-      from: `pageTitle: { fontSize: 25,`,
-      mk: (v) => `pageTitle: { fontSize: ${v},`,
-      base: 25, first: 41, sel: "h1",
-    },
-  },
-};
-
 const C = CASES[app]?.[kind];
 if (!C) { console.error(`no case for ${app}/${kind}`); process.exit(1); }
 const ORIGINAL = readFileSync(C.file, "utf8");
@@ -451,6 +407,15 @@ const paired = rows.map(({ t, p }) => (p.changed != null && t.tChanged != null ?
 console.log(`  INSTRUMENT  paired poll−trace per run: [${paired.map((x) => f1(x)).join(", ")}]  median ${f1(median(paired))} ms${MODE === "dual" ? "  (same edit → pure detection lag)" : "  (different edits → includes drift)"}`);
 console.log(`  ORDER       class ${f1(M.cls)} vs cssLive ${f1(M.css)} → ${M.css != null && M.cls != null ? (M.css > M.cls ? `CSS trails JS by ${f1(M.css - M.cls)} ms` : `JS trails CSS by ${f1(M.cls - M.css)} ms`) : "n/a"}`);
 console.log(`  flash       changed→correct ${f1(M.cor - M.chg)} ms; poll first saw ${JSON.stringify(pollTimes.map((p) => p.firstValue))}`);
+
+// Machine-readable summary for hmr-phases.mjs, which aggregates across engines.
+if (process.env.TRACE_JSON) {
+  console.log("##TRACE## " + JSON.stringify({
+    app, kind, pairs: PAIRS,
+    ws: M.ws, cssLive: M.css, class: M.cls, changed: M.chg, correct: M.cor,
+    nRes: M.nRes, pollChanged: M.pchg, pollCorrect: M.pcor,
+  }));
+}
 
 const s = traces.filter((t) => t.tCorrect != null).sort((a, b) => a.tCorrect - b.tCorrect);
 const rep = s[Math.floor(s.length / 2)] ?? traces[0];
