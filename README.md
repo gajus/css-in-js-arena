@@ -6,17 +6,17 @@ pixel-identical before anything is measured.
 
 | Engine | Integration | Version |
 | --- | --- | --- |
-| [Bamboo CSS](https://bamboocss.com) | `@bamboocss/vite` | 1.48.5 |
+| [Bamboo CSS](https://bamboocss.com) | `@bamboocss/vite` | 1.51.0 |
 | [StyleX](https://stylexjs.com) | `@stylexjs/unplugin` | 0.19.0 |
 | [Panda CSS](https://panda-css.com) | `@pandacss/postcss` | 1.12.0 |
 
-Measured 2026-08-25 · macOS, Node 24.10, Vite 8.2.1
+Measured 2026-08-27 · macOS, Node 24.10, Vite 8.2.1
 
 | Engine | Shipped bytes | Build & dev | Authoring | Correctness & maintenance | Rows won 🏆 |
 | --- | --- | --- | --- | --- | --- |
 | **Bamboo** 🏆 | **9** / 10 🏆 | 3 / 8 | **7** / 8 🏆 | **4** / 4 🏆 | **23** / 30 🏆 |
-| StyleX | 5 / 10 | 1 / 8 | 2 / 8 | 1 / 4 | 9 / 30 |
-| Panda | 2 / 10 | **5** / 8 🏆 | 6 / 8 | 1 / 4 | 14 / 30 |
+| StyleX | 5 / 10 | 2 / 8 | 2 / 8 | 1 / 4 | 10 / 30 |
+| Panda | 2 / 10 | **4** / 8 🏆 | 6 / 8 | 1 / 4 | 13 / 30 |
 
 Axes are not equally weighted and two are unscored, so the tally is a scanning aid, not the
 judgement. **Neither the byte nor the build margins survive scale.**
@@ -28,26 +28,26 @@ judgement. **Neither the byte nor the build margins survive scale.**
 | Axis | Bamboo 🏆 | StyleX | Panda |
 | --- | --- | --- | --- |
 | **Shipped bytes** | | | |
-| Full first load | **104,938 B** 🏆 | **106,117 B** 🏆 | 112,840 B |
-| CSS, brotli | **6,825 B** 🏆 | 7,008 B | 9,518 B |
-| CSS, gzip | **7,909 B** 🏆 | 8,176 B | 11,524 B |
+| Full first load | **105,097 B** 🏆 | **106,117 B** 🏆 | 112,840 B |
+| CSS, brotli | **6,845 B** 🏆 | 7,008 B | 9,518 B |
+| CSS, gzip | **7,905 B** 🏆 | 8,176 B | 11,524 B |
 | CSS, raw | **37,326 B** 🏆 | 40,430 B | 54,007 B |
 | CSS rules emitted *(not a quality axis)* | 525 | 467 | 532 |
-| Client JS, brotli | **92,569 B** 🏆 | **93,583 B** 🏆 | 97,778 B |
-| SSR HTML, gzip, mean of 6 *(tie, spread 0.3%)* | 5,544 B | 5,526 B | 5,544 B |
+| Client JS, brotli | **92,712 B** 🏆 | **93,583 B** 🏆 | 97,778 B |
+| SSR HTML, gzip, mean of 6 *(tie, spread 0.3%)* | 5,540 B | 5,526 B | 5,544 B |
 | Class attribute bytes, raw | 93,036 B | **70,843 B** 🏆 | 92,738 B |
 | Class attribute bytes, selector-heavy route | **11,728 B** 🏆 | **11,754 B** 🏆 | **11,685 B** 🏆 |
 | Unreachable CSS shipped | **0 B** 🏆 | 344 B | n/a (runtime) |
 | Orphan file in `include` (50 styles), imported by nothing | **+0 B** 🏆 | **+0 B** 🏆 | +13,200 B |
 | Stylesheets emitted | **1** 🏆 | 2 (one unreferenced) | **1** 🏆 |
 | **Build & dev** | | | |
-| Production build, cold | **1,543 ms** 🏆 | 2,301 ms | 1,688 ms |
-| Production build, warm | **1,540 ms** 🏆 | 2,322 ms | 1,673 ms |
-| Dev server cold start | 1,607 ms | 1,445 ms | **1,323 ms** 🏆 |
-| Shared edit → server reacts | 123 ms (bimodal) | **51 ms** 🏆 | **51 ms** 🏆 |
-| Shared edit → correct paint | 186 ms | 199 ms | **145 ms** 🏆 |
-| Component edit → server reacts | 135 ms (bimodal) | 76 ms | **50 ms** 🏆 |
-| Component edit → correct paint | 138 ms | 254 ms | **113 ms** 🏆 |
+| Production build, cold | **1,358 ms** 🏆 | 2,282 ms | 1,613 ms |
+| Production build, warm | **1,390 ms** 🏆 | 2,308 ms | 1,573 ms |
+| Dev server cold start | 1,555 ms | 1,398 ms | **1,284 ms** 🏆 |
+| Shared edit → server reacts | 98 ms (bimodal) | **51 ms** 🏆 | **52 ms** 🏆 |
+| Shared edit → correct paint | 210 ms | 199 ms | **170 ms** 🏆 |
+| Component edit → server reacts | 104 ms (bimodal) | **43 ms** 🏆 | 53 ms |
+| Component edit → correct paint | 129 ms | 244 ms | **103 ms** 🏆 |
 | HMR payload, one shared edit | **336 KB · 9** 🏆 | 356 KB · 10 | 402 KB · 9 |
 | **Authoring** | | | |
 | Total lines written | **3,921** 🏆 | 4,090 | **3,930** 🏆 |
@@ -64,7 +64,7 @@ judgement. **Neither the byte nor the build margins survive scale.**
 | Delete a page → CSS shrinks | **−20.0%** 🏆 | −8.4% | −13.5% |
 | Class names folded to literals | **522 / 522** 🏆 | **453 / 458** 🏆 | 25 / 529 (rest computed in browser, 14.7 KB runtime chunk) |
 | | | | |
-| **Rows won**, of 30 scored 🏆 | **23** | **9** | **14** |
+| **Rows won**, of 30 scored 🏆 | **23** | **10** | **13** |
 
 ---
 
@@ -81,10 +81,10 @@ measures the emitted stylesheet.
 
 | Style definitions | Bamboo | StyleX | Panda |
 | --- | --- | --- | --- |
-| 0 (as shipped) | ref | +2.7% | +39.5% |
-| 50 | ref | +17.7% | +35.0% |
-| 200 | ref | +49.4% | +27.3% |
-| 800 | ref | **+101.5%** | **+15.5%** |
+| 0 (as shipped) | ref | +2.4% | +39.1% |
+| 50 | ref | +17.9% | +35.3% |
+| 200 | ref | +49.2% | +27.1% |
+| 800 | ref | **+101.8%** | **+15.7%** |
 
 | | Marginal cost per declaration | Gap to Bamboo at n=0 | at n=800 |
 | --- | --- | --- | --- |
@@ -107,21 +107,28 @@ declarations, so they fold to the same classes and the stylesheet stays flat (Ba
 
 | Extra source files | Bamboo | StyleX | Panda |
 | --- | --- | --- | --- |
-| 0 (as shipped) | 124 | 50 | 51 |
-| 25 | 123 | 51 | 50 |
-| 100 | 123 | 51 | 51 |
-| 400 | 111 | 51 | 51 |
+| 0 (as shipped) | 35 | 52 | 50 |
+| 25 | 122 | 51 | 52 |
+| 100 | 124 | 52 | 52 |
+| 400 | 123 | 50 | 52 |
 
-**Per-edit cost is flat in file count for all three.** None re-reads the source inventory to answer an
-edit, so Bamboo's gap is a fixed ~2.4×, not a scaling one. Whole-inventory work is not flat:
+**Per-edit cost is flat in file count.** None of the three re-reads the source inventory to answer an
+edit. StyleX and Panda hold to within 2 ms across 400 files. Bamboo's points span 35–124 ms, but each
+is a 7-run median drawn from a bimodal distribution, and seven runs cannot place a median reliably
+between two clusters. A second sweep puts the same sizes in different clusters — 98, 125, 123, 57 ms
+against the 35, 122, 124, 123 above — which is what sampling looks like and what a slope does not.
+Bamboo's gap to the other two is a fixed ~2×. Whole-inventory work is not flat:
 
 | | Bamboo | StyleX | Panda |
 | --- | --- | --- | --- |
-| Production build, 0 → 400 files | 1,484 → 2,092 ms (**+41%**) | 2,426 → 2,884 ms (+19%) | 1,785 → 1,954 ms (**+9%**) |
-| Dev server cold start, 0 → 400 files | 1,644 → 2,354 ms (**+43%**) | 1,498 → 2,093 ms (+40%) | 1,471 → 1,675 ms (**+14%**) |
+| Production build, 0 → 400 files | 1,422 → 2,793 ms (**+96%**) | 2,295 → 2,674 ms (+17%) | 1,568 → 1,814 ms (**+16%**) |
+| Dev server cold start, 0 → 400 files | 1,530 → 2,930 ms (**+91%**) | 1,420 → 1,899 ms (+34%) | 1,259 → 1,509 ms (**+20%**) |
 
-Bamboo wins both rows outright in the main table and loses both slopes here. Panda is flattest in file
-count as in rule count.
+**Bamboo wins both build rows in the main table and has the steepest slope on both here**, and by
+enough that it is not sampling: a second sweep reproduces it at +107% and +94%. At 400 extra files
+its production build has crossed StyleX's, the row it wins by 40% at the arena's size. Panda is
+flattest in file count as it is in rule count, so the build ranking at this repo's size is not the
+ranking at a large app's.
 
 ### Theming
 
@@ -133,9 +140,9 @@ colours light and dark.
 
 | Brand themes | Bamboo | StyleX | Panda |
 | --- | --- | --- | --- |
-| 0 | 6,825 B | 7,008 B | 9,518 B |
-| 2 | 6,825 B | 7,427 B | 9,518 B |
-| 8 | 6,825 B | 8,350 B | 9,518 B |
+| 0 | 6,845 B | 7,008 B | 9,518 B |
+| 2 | 6,845 B | 7,427 B | 9,518 B |
+| 8 | 6,845 B | 8,350 B | 9,518 B |
 | **added per theme** | **0 B** 🏆 | +168 B | **0 B** 🏆 |
 
 **Theme payload, fetched only when a theme is selected:**
@@ -224,23 +231,25 @@ fixture; the finding is which engines are at zero.
 Because one number measured the wrong event, in a way that changed the ranking. The old probe polled
 `getComputedStyle` until it differed from the previous value. `tools/hmr-trace.mjs` shows two faults:
 
-**It fires on a flash.** The first value seen is an inherited fallback, `15px`, in every run for every
-engine. The written value arrives 57–61 ms later on the shared edit.
+**It fires on a flash.** The first value seen is an inherited fallback, `15px`. On the shared edit the
+written value arrives ~50 ms later for Bamboo and ~39 ms later for StyleX; Panda's lands in the same
+frame.
 
 **It is not the same event across engines.** An edit produces two signals, the CSS going live and the
 JS module re-executing, and the poll catches whichever is first. StyleX lands CSS after its JS, Bamboo
 and Panda before it.
 
-Correcting both reverses the row. To correct paint the shared edit is Panda 145 ms, Bamboo 186 ms,
-StyleX 199 ms, where the old probe had StyleX fastest by 40%.
+Correcting both reverses the row. To correct paint the shared edit is Panda 170 ms, StyleX 199 ms,
+Bamboo 210 ms — while the flash the old probe fired on lands at Bamboo 159 ms, StyleX 161 ms, Panda
+170 ms, which puts the engine that is actually slowest to paint nominally first.
 
 Of the four rows only **server reacts** (write to HMR broadcast) is attributable to the engine alone.
 Everything later includes Vite's protocol, React Fast Refresh and the socket round trip. **Correct
 paint** is end to end.
 
-Bamboo's server reaction is marked bimodal because it is: about a third of runs near 35 ms, the rest
-near 125 ms. Small samples invent trends, so a 7-run median suggested its cost grew with file count
-where 15 runs per point showed it flat.
+Bamboo's server reaction is marked bimodal because it is: on the shared edit about a third of runs
+land near 25 ms and the rest near 120 ms, so the pooled median sits between two clusters rather than on
+either. Small samples invent trends here, which is why the main-table rows pool 28 runs.
 
 `HMR payload` counts bytes, not milliseconds, and reproduces exactly.
 

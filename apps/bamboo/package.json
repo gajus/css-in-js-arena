@@ -18,8 +18,8 @@
     "react-router": "^8"
   },
   "devDependencies": {
-    "@bamboocss/dev": "^1.48.5",
-    "@bamboocss/vite": "^1.48.5",
+    "@bamboocss/dev": "^1.51.0",
+    "@bamboocss/vite": "^1.51.0",
     "@react-router/dev": "^8",
     "@types/node": "^22",
     "@types/react": "^19.2.14",
