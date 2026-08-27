@@ -127,6 +127,7 @@ node orphan.mjs       # a module matching `include` that nothing imports
 node theming.mjs      # cost of N brand themes — reported separately, not in the main table
 node scale.mjs        # marginal cost per rule at 0/50/200/800 styles — reported separately
 node dev-scale.mjs    # dev loop cost at 0/25/100/400 extra files — reported separately
+ORPHANED=1 node dev-scale.mjs   # same sweep, modules unimported — isolates inventory cost
 ```
 
 ### 6. Measure HMR

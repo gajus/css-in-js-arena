@@ -28,6 +28,11 @@ import { ENGINES as engines } from "./engines.mjs";
 
 const ROOT = new URL("..", import.meta.url).pathname.replace(/\/$/, "");
 const COUNTS = (process.env.COUNTS ?? "0,25,100,400").split(",").map(Number);
+/** ORPHANED=1 generates the same modules but does NOT hang the barrel off
+ *  ui.ts, so they match `include` while staying out of the bundle graph. The
+ *  difference between the two passes is what an engine spends on a file whose
+ *  extraction result it then discards. */
+const ORPHANED = process.env.ORPHANED === "1";
 const EDIT_RUNS = Number(process.env.RUNS ?? 7);
 const BUILD_RUNS = Number(process.env.BUILD_RUNS ?? 3);
 const START_RUNS = Number(process.env.START_RUNS ?? 3);
@@ -72,8 +77,9 @@ const median = (a) => {
 };
 
 /** Write N modules plus a barrel, and hang the barrel off ui.ts so StyleX —
- *  which only sees the bundle graph — counts them too. Returns the undo. */
-const apply = (engine, dir, n) => {
+ *  which only sees the bundle graph — counts them too. Under ORPHANED the
+ *  anchor is left alone, so nothing imports them. Returns the undo. */
+const apply = (engine, dir, n, imported = !ORPHANED) => {
   const modDir = join(dir, DIR);
   const anchorPath = join(dir, anchorFile);
   const anchorOriginal = readFileSync(anchorPath, "utf8");
@@ -92,7 +98,7 @@ const apply = (engine, dir, n) => {
       Array.from({ length: n }, (_, i) => `  m${i},`).join("\n") +
       `\n];\n`,
   );
-  writeFileSync(anchorPath, anchorOriginal + anchorLine);
+  if (imported) writeFileSync(anchorPath, anchorOriginal + anchorLine);
   return undo;
 };
 

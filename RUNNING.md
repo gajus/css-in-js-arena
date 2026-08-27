@@ -161,10 +161,17 @@ cd tools
 node scale.mjs     # marginal cost per rule at 0 / 50 / 200 / 800 style definitions
 node theming.mjs   # cost of 0 / 1 / 2 / 4 / 8 brand themes, per engine's own API
 node dev-scale.mjs # dev loop cost at 0 / 25 / 100 / 400 extra source files
+
+ORPHANED=1 node dev-scale.mjs   # same sweep, modules left unimported
 ```
 
 All three rewrite app sources, build, and restore. They take several minutes each; dev-scale is the
 longest, since it boots a dev server at every size.
+
+`ORPHANED=1` writes the same generated modules but does not hang the barrel off `ui.ts`, so they match
+each engine's `include` while staying out of the bundle graph. Subtracting that pass from the default
+one separates what an engine spends *reading* a file from what it spends *using* it — for an engine
+that scopes emission to the bundle graph, the difference is work whose output is discarded.
 
 ## Interpreting timings
 
