@@ -128,10 +128,22 @@ Bamboo's gap to the other two is a fixed ~2×. Whole-inventory work is not flat:
 
 **Per-added-file cost is a constant, and Bamboo's constant is the high one — 3.6× StyleX's and 5.5×
 Panda's.** Read the milliseconds, not a percentage: the app is 13 source files, so 400 more is 32× the
-inventory and *any* per-file constant reads as a triple-digit percentage off that base. Nothing here
-is quadratic. Bamboo's marginal cost *falls* as the inventory grows — 3.90 ms per file over the first
-hundred, 2.99 over the next hundred, 2.86 over the last two hundred — which is a fixed cost per file
-amortising, not a scaling term.
+inventory and *any* per-file constant reads as a triple-digit percentage off that base.
+
+Nothing here is quadratic, and the constant is what decides it. Carried out to 1,600 extra files
+(`COUNTS=0,400,800,1600`), each engine's cost stays linear — Bamboo's second differences over equal
+400-file steps are +448 and −343 ms, changing sign, so there is no superlinear term to find:
+
+| Extra source files | 0 | 400 | 800 | 1,600 | per added file |
+| --- | --- | --- | --- | --- | --- |
+| Bamboo | 1,263 ms | 2,614 ms | 3,924 ms | 7,097 ms | 3.74 ms |
+| StyleX | 2,316 ms | 2,630 ms | 3,047 ms | 3,919 ms | 1.00 ms |
+| Panda | 1,527 ms | 1,788 ms | 1,930 ms | 2,294 ms | 0.48 ms |
+
+**This is where the main table's build rows stop generalising.** Bamboo is the fastest build in this
+repo and the slowest by 1,600 files — 3.1× Panda, 1.8× StyleX. Those slopes put the crossover at
+roughly **95 total source files against Panda and 400 against StyleX**, both of which a real
+application passes early. The main table's 40% build win is a property of a 13-file app.
 
 Most of Bamboo's constant buys nothing. Run the same sweep with `ORPHANED=1`, which generates the same
 modules but leaves them unimported — inside `include`, outside the bundle graph:
@@ -141,15 +153,12 @@ modules but leaves them unimported — inside `include`, outside the bundle grap
 | Production build | 1,291 → 2,083 ms (**+792 ms**) | 2,139 → 2,110 ms (−29 ms) | 1,532 → 1,561 ms (+29 ms) |
 | CSS emitted for them | **+0 B** | **+0 B** | +168 B |
 
-Bamboo spends **1.98 ms per file** reading files it then discards for being outside the bundle graph —
-58% of its total per-file cost, for zero emitted bytes. StyleX never opens them and pays nothing; Panda
-reads them for 0.07 ms each and keeps the result. This is the same bundle-graph scoping that wins
-Bamboo the orphan-file row in the main table, seen from its cost side rather than its byte side: the
-file is scanned either way, and only the output is dropped.
-
-At 400 extra files Bamboo's build crosses StyleX's — the row it wins by 40% at the arena's size — so
-the build ranking at this repo's size is not the ranking at a large app's. Panda is flattest in file
-count as it is in rule count.
+The orphaned sweep is linear too, at **2.01 ms per file** over the same 400→1,600 range — so **54% of
+Bamboo's per-file cost is spent reading files it then discards** for being outside the bundle graph,
+for zero emitted bytes. StyleX never opens them and pays nothing; Panda reads them for 0.07 ms each
+and keeps the result. This is the same bundle-graph scoping that wins Bamboo the orphan-file row in
+the main table, seen from its cost side rather than its byte side: the file is scanned either way, and
+only the output is dropped. Panda is flattest in file count as it is in rule count.
 
 ### Theming
 
