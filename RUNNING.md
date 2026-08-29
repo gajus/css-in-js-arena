@@ -113,8 +113,8 @@ The two rows this replaced polled `getComputedStyle` until it differed from the 
 is wrong twice over, and both are visible in the tool's own output:
 
 - The first change it sees is an **inherited fallback**, not the written value — a flash. The
-  `(flash → correct)` row is how far ahead of the real paint that fires; it has been 57–61 ms on the
-  shared edit.
+  `(flash → correct)` row is how far ahead of the real paint that fires; it runs 0–48 ms on the
+  shared edit, and the head start differs per engine, so it is not a fixed offset you can subtract.
 - Whichever of the CSS and JS signals lands first is what such a poll catches, and **the order is
   engine-dependent** — the `which signal lands last` row. So the old columns were not comparing the
   same event between engines, which is why that row needed 60 runs and still landed with margins
@@ -124,9 +124,10 @@ is wrong twice over, and both are visible in the tool's own output:
 trace instead — browser open, CDP poll running — the same figure moves 3–10× sweep to sweep, so the
 tool measures it separately and reports the socket number.
 
-**Bamboo's `write → ws` is bimodal**: roughly a third of runs land near 35 ms and the rest near
-125 ms. Pool at least 20 runs per engine before reading it, and do not treat a 7-run median as
-settled — a small sample lands wherever the cluster mix happens to fall.
+**Bamboo's `write → ws` is bimodal**: roughly a fifth of runs land near 25 ms and most of the rest
+near 125 ms. StyleX's component edit splits the same way, between ~10 ms and ~90 ms. Pool at least
+20 runs per engine before reading either, and do not treat a 7-run median as settled — a small
+sample lands wherever the cluster mix happens to fall.
 
 ```bash
 node hmr-payload.mjs bamboo 4001     # bytes the browser refetches — needs a server you started
