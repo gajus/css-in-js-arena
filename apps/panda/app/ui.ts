@@ -275,7 +275,7 @@ export const sectionTitle = css({ fontSize: "16px", fontWeight: 600, marginBotto
 export const sectionNote = css({ fontSize: "13px", color: "muted", marginBottom: "16px", maxWidth: "60ch" });
 export const stack = css({ display: "flex", flexDirection: "column", gap: "18px" });
 
-export const iconButton = css({
+export const iconButton = css.raw({
   display: "grid",
   placeItems: "center",
   width: "32px",

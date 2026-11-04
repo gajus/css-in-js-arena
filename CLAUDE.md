@@ -102,8 +102,16 @@ frame each app was caught on, and the gate fails at random with a different delt
 style tag — `compare.mjs` gets the same protection from Playwright's `animations: "disabled"`.
 
 Expected: **no geometry differences > 1px** on every route, and every combination `MATCH` with worst
-case ≈0.047%. The residual is the footer credit line, which differs on purpose. Anything larger is a
-real divergence — fix it, do not record numbers around it.
+case ≈0.043% (pixelmatch 8's OKLab metric). The residual is the footer credit line, which differs on
+purpose, plus StyleX's `/lab` sweep ring, which StyleX does not render — it emits no rule for that
+`background: conic-gradient(...)`. Anything larger is a real divergence — fix it, do not record
+numbers around it.
+
+The gate is blind below its 0.05% threshold. A wrong colour on one docs nav item passed at 0.015%,
+so after an engine update scan for order-dependent class conflicts too: for every element, pairs of
+classes whose rules set the same property under the same condition, and which one the stylesheet lets
+win. A size mismatch also short-circuits `compare.mjs` before it diffs pixels, so a 1px height drift
+hides every colour difference on that page until it is fixed.
 
 ### 4. Measure — servers running
 
@@ -119,7 +127,7 @@ Kill the servers first; CPU contention skews timings.
 ```bash
 lsof -ti:3001,3002,3003 | xargs kill
 RUNS=5 ./timings.sh   # production build, cold and warm
-RUNS=3 ./devstart.sh  # dev server cold start
+RUNS=7 ./devstart.sh  # dev server cold start
 ./deadcode.sh         # delete a page, see what happens to the CSS
 ./typesafety.sh       # token-name and property-name typos
 node authoring.mjs    # lines of styling code
@@ -152,13 +160,15 @@ Both faults stay visible in the tool's own `(flash → correct)` and `which sign
 keep them, they are the audit that the axis is still measuring what it claims.
 
 Only `write → ws` is attributable to the engine alone. It comes from a bare `vite-hmr` websocket
-with no browser attached; taken through the trace it moves 3–10× sweep to sweep. **Bamboo's is
-bimodal** — about a third of runs near 35 ms, the rest near 125 ms — so pool at least 20 runs before
-reading it. A 7-run median lands wherever the cluster mix falls and will invent a trend that is not
-there.
+with no browser attached; taken through the trace it moves 3–10× sweep to sweep. **Panda's is
+bimodal** — about two fifths of runs near 20 ms, two fifths between 75 and 130 ms — so pool at least
+20 runs before reading it. A 7-run median lands wherever the cluster mix falls and will invent a trend
+that is not there. Which engine is bimodal has changed between releases; read the `every run` dump
+rather than assuming.
 
-`hmr-payload.mjs` is still driven by hand against a server you start, and still wants ~10s of warm-up
-and the second measurement rather than the first.
+`hmr-payload.mjs` is still driven by hand against a server you start, and still wants ~10s of warm-up,
+then repeated runs until two consecutive ones agree — the inflated reading can come second as well as
+first.
 
 Note: the dev server binds IPv6 `localhost` only. `127.0.0.1` refuses the connection — the
 production server does not have this problem.
@@ -237,7 +247,7 @@ what to be sceptical of; they are conversation, not repo content.
 
 Two habits that survived from such comparisons and are worth keeping, stated as our own reasoning:
 
-- **Scale.** The arena is ~550 rule blocks. Any per-engine constant that looks decisive at that size
+- **Scale.** The arena is ~660 rule blocks. Any per-engine constant that looks decisive at that size
   is worth re-checking with `scale.mjs` before it goes in the verdict — a fixed overhead reads as a
   large percentage on a small app and vanishes on a big one.
 - **The happy path hides failure modes.** Every app here is required to build at 0 warnings, which is
@@ -252,14 +262,21 @@ Two habits that survived from such comparisons and are worth keeping, stated as 
   `baseline-widely-available` target it downlevels `light-dark()` into a 54-variable polyfill. That
   measures the downleveller, not the engine, and it only penalises engines that emit modern CSS.
   Keep it off so each stylesheet is what its engine wrote. An engine that bundles Lightning CSS
-  itself (StyleX, Panda) is a different matter — that is its product and stays.
-- Measure every engine in the **default configuration** it ships. Opt-in settings (`hash`,
-  `strictValues`, `pruneCss` and their equivalents) get measured and reported separately, never
-  folded into the main table.
+  itself (StyleX) is a different matter — that is its product and stays.
+- Measure every engine in the **default configuration** it ships. Opt-in settings (`strictValues`,
+  `pruneCss`, Panda's `hash` and its Vite plugin's `transform`, and their equivalents) get measured
+  and reported separately, never folded into the main table. Bamboo hashes production class names by
+  default (`hash.className: 'auto'`), so its hashed names are in the main table.
+- **In the Panda app, an override is a `css()` merge, never a `cx()` join.** Panda's `cx()` only
+  concatenates, and Panda orders same-property atomic rules alphabetically by value, so
+  `cx(row, last && rowLast)` wins or loses by the alphabet. Where a later style overrides an earlier
+  one for the same property, both are `css.raw()` objects merged with `css(a, b)` at the call site;
+  `cx()` is for classes that never conflict. Bamboo compiles `cx()` into a merge and StyleX's
+  `stylex.props()` merges, so this is the Panda equivalent of what the other two apps write.
 - If one engine gains a capability another lacks, add a row rather than dropping the axis — the
   asymmetries are the interesting part.
-- When an engine's own defaults change between versions, re-measure everything. Output has been
-  byte-stable across several Bamboo releases, but validation defaults have not.
+- When an engine's own defaults change between versions, re-measure everything. Output and
+  validation defaults have both moved between Bamboo releases.
 
 ## Probe hygiene
 

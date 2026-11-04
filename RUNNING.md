@@ -10,7 +10,7 @@ Each engine gets a port pair by its index in `tools/engines.json` — `300N` for
 | --- | --- | --- | --- |
 | Bamboo CSS | `@bamboocss/vite` | 3001 | 4001 |
 | StyleX | `@stylexjs/unplugin` | 3002 | 4002 |
-| Panda CSS | `@pandacss/postcss` | 3003 | 4003 |
+| Panda CSS | `@pandacss/vite` | 3003 | 4003 |
 
 `tools/engines.json` is the single source of truth for that list. Adding an engine is a checklist —
 see [`CLAUDE.md`](./CLAUDE.md).
@@ -55,7 +55,12 @@ node compare.mjs
 ```
 
 Expected: **no geometry differences > 1px** on every route, and every combination `MATCH` with a
-worst case of ≈0.047% — that residual is the footer credit line, which differs on purpose.
+worst case of ≈0.043% — that residual is the footer credit line, which differs on purpose, plus on
+StyleX's `/lab` the sweep ring, which StyleX does not render.
+
+The pixel threshold is 0.05% of the screenshot, so a divergence confined to a small element — one nav
+item's colour, one border — passes it. Geometry catches what moves layout; colour on small elements
+needs a computed-style check of its own after an engine update.
 
 Two things that are easy to get wrong:
 
@@ -113,7 +118,7 @@ The two rows this replaced polled `getComputedStyle` until it differed from the 
 is wrong twice over, and both are visible in the tool's own output:
 
 - The first change it sees is an **inherited fallback**, not the written value — a flash. The
-  `(flash → correct)` row is how far ahead of the real paint that fires; it runs 0–48 ms on the
+  `(flash → correct)` row is how far ahead of the real paint that fires; it runs 0–74 ms on the
   shared edit, and the head start differs per engine, so it is not a fixed offset you can subtract.
 - Whichever of the CSS and JS signals lands first is what such a poll catches, and **the order is
   engine-dependent** — the `which signal lands last` row. So the old columns were not comparing the
@@ -124,19 +129,20 @@ is wrong twice over, and both are visible in the tool's own output:
 trace instead — browser open, CDP poll running — the same figure moves 3–10× sweep to sweep, so the
 tool measures it separately and reports the socket number.
 
-**Bamboo's `write → ws` is bimodal**: roughly a fifth of runs land near 25 ms and most of the rest
-near 125 ms. StyleX's component edit splits the same way, between ~10 ms and ~90 ms. Pool at least
-20 runs per engine before reading either, and do not treat a 7-run median as settled — a small
-sample lands wherever the cluster mix happens to fall.
+**Panda's `write → ws` is bimodal**: on both edits about two fifths of runs land near 20 ms and about
+two fifths between 75 and 130 ms, the rest in between. Pool at least 20 runs per engine before reading
+it, and do not treat a 7-run median as settled — a small sample lands wherever the cluster mix happens
+to fall.
 
 ```bash
 node hmr-payload.mjs bamboo 4001     # bytes the browser refetches — needs a server you started
 ```
 
 `hmr-payload.mjs` still wants a dev server you start yourself, and is deterministic **once it has
-finished warming** — give it ~10s after the port answers and take the second measurement, not the
-first. Measured too early it reports an inflated payload and an extra response (StyleX has been seen
-at 392 KB · 11 instead of its stable 356 KB · 10). If two consecutive runs agree, the number is real.
+finished warming** — give it ~10s after the port answers, then measure until two consecutive runs
+agree. An unsettled server reports an inflated payload and an extra response (StyleX has been seen at
+392 KB · 11 instead of its stable 355 KB · 10), and that reading can come on the second run as well as
+the first.
 
 `hmr-trace.mjs` is the underlying instrument and can be run directly on one engine for the full
 per-run detail — every websocket message, every module refetch, head mutations:

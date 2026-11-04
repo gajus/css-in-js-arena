@@ -1,4 +1,4 @@
 /* Panda emits into these layers; the @layer statement fixes their order before
-   any rule is seen. The PostCSS plugin replaces each directive with the
-   generated CSS at build time. */
+   any rule is seen. The Vite plugin treats the file declaring them as the root
+   of the generated stylesheet and injects the CSS here. */
 @layer reset, base, tokens, recipes, utilities;

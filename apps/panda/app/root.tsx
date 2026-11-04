@@ -107,12 +107,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 type="button"
                 aria-label={`Theme: ${theme}`}
                 onClick={() => setTheme(nextTheme[theme])}
-                className={iconButton}
+                className={css(iconButton)}
               >
                 {themeIcon[theme]}
               </button>
 
-              <button type="button" aria-label="Notifications" className={iconButton}>
+              <button type="button" aria-label="Notifications" className={css(iconButton)}>
                 <BellIcon />
               </button>
 
@@ -121,7 +121,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 aria-label="Toggle navigation"
                 aria-expanded={menuOpen}
                 onClick={() => setMenuOpen((open) => !open)}
-                className={cx(iconButton, s.navToggle)}
+                className={css(iconButton, s.navToggle)}
               >
                 <MenuIcon />
               </button>
@@ -304,7 +304,7 @@ const s = {
     pointerEvents: "none",
     lineHeight: 0,
   }),
-  navToggle: css({ display: { base: "none", _tablet: "grid" } }),
+  navToggle: css.raw({ display: { base: "none", _tablet: "grid" } }),
   main: css({
     flexGrow: 1,
     width: "100%",

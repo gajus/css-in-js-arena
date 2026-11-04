@@ -29,7 +29,7 @@ export default function Docs() {
                   <a
                     href="/docs"
                     aria-current={item.active ? "page" : undefined}
-                    className={cx(s.navItem, item.active && s.navItemOn)}
+                    className={css(s.navItem, item.active && s.navItemOn)}
                   >
                     {item.label}
                   </a>
@@ -229,7 +229,7 @@ const s = {
     color: "faint",
     marginBottom: "6px",
   }),
-  navItem: css({
+  navItem: css.raw({
     display: "block",
     paddingBlock: "5px",
     paddingInline: "10px",
@@ -241,7 +241,7 @@ const s = {
     transitionProperty: "color, border-color",
     transitionDuration: "0.15s",
   }),
-  navItemOn: css({
+  navItemOn: css.raw({
     borderLeftColor: "accent",
     color: { base: "accent", _hover: "accent" },
     fontWeight: 600,

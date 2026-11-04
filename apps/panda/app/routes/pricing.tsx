@@ -46,7 +46,7 @@ export default function Pricing() {
         {plans.map((plan) => {
           const amount = plan.price[period];
           return (
-            <article key={plan.name} className={cx(s.plan, plan.featured && s.planFeatured)}>
+            <article key={plan.name} className={css(s.plan, plan.featured && s.planFeatured)}>
               {plan.featured && <span className={s.planRibbon}>Most popular</span>}
               <div>
                 <h2 className={s.planName}>{plan.name}</h2>
@@ -88,16 +88,16 @@ export default function Pricing() {
         <table className={s.table}>
           <thead>
             <tr>
-              <th scope="col" className={cx(s.th, s.thLeft)}>
+              <th scope="col" className={css(s.th, s.thLeft)}>
                 Feature
               </th>
-              <th scope="col" className={s.th}>
+              <th scope="col" className={css(s.th)}>
                 Starter
               </th>
-              <th scope="col" className={s.th}>
+              <th scope="col" className={css(s.th)}>
                 Team
               </th>
-              <th scope="col" className={s.th}>
+              <th scope="col" className={css(s.th)}>
                 Enterprise
               </th>
             </tr>
@@ -107,10 +107,10 @@ export default function Pricing() {
               const last = i === comparison.length - 1;
               return (
                 <tr key={row.feature} className={s.tr}>
-                  <td className={cx(s.td, last && s.tdLast, s.tdFirst)}>{row.feature}</td>
-                  <td className={cx(s.td, last && s.tdLast)}>{row.starter}</td>
-                  <td className={cx(s.td, last && s.tdLast, s.tdFeatured)}>{row.team}</td>
-                  <td className={cx(s.td, last && s.tdLast)}>{row.enterprise}</td>
+                  <td className={css(s.td, last && s.tdLast, s.tdFirst)}>{row.feature}</td>
+                  <td className={css(s.td, last && s.tdLast)}>{row.starter}</td>
+                  <td className={css(s.td, last && s.tdLast, s.tdFeatured)}>{row.team}</td>
+                  <td className={css(s.td, last && s.tdLast)}>{row.enterprise}</td>
                 </tr>
               );
             })}
@@ -153,7 +153,7 @@ const s = {
     maxWidth: { _tablet: "440px" },
     marginInline: { _tablet: "auto" },
   }),
-  plan: css({
+  plan: css.raw({
     position: "relative",
     display: "flex",
     flexDirection: "column",
@@ -166,7 +166,7 @@ const s = {
     rounded: "lg",
     boxShadow: "sm",
   }),
-  planFeatured: css({
+  planFeatured: css.raw({
     borderColor: "accent",
     boxShadow: "lg",
     transform: { _desktop: "scale(1.035)" },
@@ -223,7 +223,7 @@ const s = {
     boxShadow: "sm",
   }),
   table: css({ width: "100%", minWidth: "620px", borderCollapse: "separate", borderSpacing: 0 }),
-  th: css({
+  th: css.raw({
     paddingBlock: "10px",
     paddingInline: "14px",
     bg: "surface2",
@@ -235,13 +235,13 @@ const s = {
     color: "text",
     textAlign: "center",
   }),
-  thLeft: css({ textAlign: "left" }),
+  thLeft: css.raw({ textAlign: "left" }),
   tr: css({
     bg: { base: "transparent", _hover: "surface2" },
     transitionProperty: "background-color",
     transitionDuration: "0.12s",
   }),
-  td: css({
+  td: css.raw({
     paddingBlock: "11px",
     paddingInline: "14px",
     borderBottomWidth: "1px",
@@ -250,9 +250,9 @@ const s = {
     fontSize: "13.5px",
     textAlign: "center",
   }),
-  tdFirst: css({ textAlign: "left", fontWeight: 550 }),
-  tdLast: css({ borderBottomWidth: "0" }),
-  tdFeatured: css({ bg: "accentSoft", color: "accent", fontWeight: 600 }),
+  tdFirst: css.raw({ textAlign: "left", fontWeight: 550 }),
+  tdLast: css.raw({ borderBottomWidth: "0" }),
+  tdFeatured: css.raw({ bg: "accentSoft", color: "accent", fontWeight: 600 }),
 
   faqList: css({ display: "flex", flexDirection: "column", gap: "10px" }),
   faq: css({

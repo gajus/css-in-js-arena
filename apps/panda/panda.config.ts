@@ -5,6 +5,10 @@ import { defineConfig } from "@pandacss/dev";
  * declare — all three apps must render the same pixels.
  */
 export default defineConfig({
+  // Panda 2 no longer implies these. `panda init` writes and installs both, and
+  // the token scale and conditions the app relies on come from them.
+  presets: ["@pandacss/preset-base", "@pandacss/preset-panda"],
+
   preflight: true,
 
   include: ["./app/**/*.{js,jsx,ts,tsx}"],

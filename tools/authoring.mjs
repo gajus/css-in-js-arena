@@ -17,9 +17,10 @@ const countLines = (file) => {
   }
 };
 
-// Lines inside a style-authoring call: css()/cva()/sva() for Bamboo,
+// Lines inside a style-authoring call: css()/cva()/sva() for Bamboo and Panda,
+// plus Panda's css.raw() for style objects merged at the call site, and
 // stylex.create()/defineVars()/createTheme() for StyleX.
-const CALL = /(?:\b(?:css|cva|sva)\s*\(\s*\{)|(?:stylex\.(?:create|defineVars|createTheme)\s*\()/;
+const CALL = /(?:\b(?:css|cva|sva)(?:\.raw)?\s*\(\s*\{)|(?:stylex\.(?:create|defineVars|createTheme)\s*\()/;
 
 function styleLines(file) {
   let src;

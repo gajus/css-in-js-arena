@@ -179,7 +179,7 @@ export default function Dashboard() {
             {activity.map((item, i) => (
               <li
                 key={`${item.who}-${item.target}`}
-                className={cx(s.feedItem, i === activity.length - 1 && s.feedItemLast)}
+                className={css(s.feedItem, i === activity.length - 1 && s.feedItemLast)}
               >
                 <span aria-hidden="true" className={avatar({ size: "sm" })}>
                   {item.initials}
@@ -280,7 +280,7 @@ const s = {
   swatchPrimary: css({ bg: "accent" }),
   swatchSecondary: css({ bg: "barSecondary" }),
 
-  feedItem: css({
+  feedItem: css.raw({
     display: "flex",
     alignItems: "flex-start",
     gap: "10px",
@@ -290,7 +290,7 @@ const s = {
     borderBottomStyle: "solid",
     borderBottomColor: "border",
   }),
-  feedItemLast: css({ borderBottomWidth: "0" }),
+  feedItemLast: css.raw({ borderBottomWidth: "0" }),
   feedText: css({
     flexGrow: 1,
     fontSize: "13px",

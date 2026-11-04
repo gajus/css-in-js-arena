@@ -106,13 +106,13 @@ export default function Settings() {
                 <label htmlFor="org-name" className={s.label}>
                   Organisation name
                 </label>
-                <input id="org-name" defaultValue="Nimbus Systems, Inc." className={s.input} />
+                <input id="org-name" defaultValue="Nimbus Systems, Inc." className={css(s.input)} />
               </div>
               <div className={s.formRow}>
                 <label htmlFor="org-slug" className={s.label}>
                   URL slug
                 </label>
-                <input id="org-slug" defaultValue="nimbus" className={s.input} />
+                <input id="org-slug" defaultValue="nimbus" className={css(s.input)} />
                 <span className={s.hint}>nimbus.app/nimbus</span>
               </div>
               <div className={s.formRow}>
@@ -124,7 +124,7 @@ export default function Settings() {
                   type="email"
                   defaultValue="billing@nimbus"
                   aria-invalid="true"
-                  className={cx(s.input, s.inputError)}
+                  className={css(s.input, s.inputError)}
                 />
                 <span className={s.error}>Enter a complete email address.</span>
               </div>
@@ -132,7 +132,7 @@ export default function Settings() {
                 <label htmlFor="region" className={s.label}>
                   Default region
                 </label>
-                <select id="region" defaultValue="us-east-1" className={cx(s.input, s.select)}>
+                <select id="region" defaultValue="us-east-1" className={css(s.input, s.select)}>
                   <option value="us-east-1">us-east-1 · N. Virginia</option>
                   <option value="eu-west-2">eu-west-2 · London</option>
                   <option value="ap-south-1">ap-south-1 · Mumbai</option>
@@ -145,7 +145,7 @@ export default function Settings() {
                 <textarea
                   id="description"
                   defaultValue="Deployment and observability platform for multi-region teams."
-                  className={cx(s.input, s.textarea)}
+                  className={css(s.input, s.textarea)}
                 />
                 <span className={s.hint}>
                   Shown on your public status page. Markdown supported.
@@ -163,7 +163,7 @@ export default function Settings() {
             {notifications.map((item, i) => (
               <div
                 key={item.name}
-                className={cx(
+                className={css(
                   s.toggleRow,
                   i === 0 && s.toggleRowFirst,
                   i === notifications.length - 1 && s.toggleRowLast,
@@ -278,7 +278,7 @@ const s = {
   formRow: css({ display: "flex", flexDirection: "column", gap: "5px" }),
   formRowFull: css({ gridColumn: "1 / -1" }),
   label: css({ fontSize: "12.5px", fontWeight: 600, color: "text", cursor: "pointer" }),
-  input: css({
+  input: css.raw({
     width: "100%",
     paddingBlock: "8px",
     paddingInline: "11px",
@@ -295,16 +295,16 @@ const s = {
     transitionDuration: "0.15s",
     _placeholder: { color: "faint", opacity: 1 },
   }),
-  inputError: css({
+  inputError: css.raw({
     borderColor: { base: "danger", _focus: "danger" },
     boxShadow: { base: "none", _focus: "0 0 0 3px {colors.dangerSoft}" },
   }),
-  select: css({ appearance: "none", paddingRight: "24px" }),
-  textarea: css({ minHeight: "80px", resize: "vertical" }),
+  select: css.raw({ appearance: "none", paddingRight: "24px" }),
+  textarea: css.raw({ minHeight: "80px", resize: "vertical" }),
   hint: css({ fontSize: "12px", color: "faint" }),
   error: css({ fontSize: "12px", color: "danger", fontWeight: 500 }),
 
-  toggleRow: css({
+  toggleRow: css.raw({
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
@@ -314,8 +314,8 @@ const s = {
     borderBottomStyle: "solid",
     borderBottomColor: "border",
   }),
-  toggleRowFirst: css({ paddingTop: "0" }),
-  toggleRowLast: css({ borderBottomWidth: "0", paddingBottom: "0" }),
+  toggleRowFirst: css.raw({ paddingTop: "0" }),
+  toggleRowLast: css.raw({ borderBottomWidth: "0", paddingBottom: "0" }),
   toggleCopy: css({ minWidth: 0 }),
   toggleName: css({ fontSize: "13.5px", fontWeight: 550 }),
   toggleDesc: css({ fontSize: "12.5px", color: "muted", marginTop: "2px" }),

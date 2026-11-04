@@ -92,28 +92,28 @@ export default function Projects() {
         <table className={s.table}>
           <thead>
             <tr>
-              <th scope="col" className={cx(s.th, s.colTight)}>
+              <th scope="col" className={css(s.th, s.colTight)}>
                 <input type="checkbox" aria-label="Select all projects" className={s.check} />
               </th>
-              <th scope="col" className={s.th}>
+              <th scope="col" className={css(s.th)}>
                 Project
               </th>
-              <th scope="col" className={s.th}>
+              <th scope="col" className={css(s.th)}>
                 Owner
               </th>
-              <th scope="col" className={s.th}>
+              <th scope="col" className={css(s.th)}>
                 Status
               </th>
-              <th scope="col" className={s.th}>
+              <th scope="col" className={css(s.th)}>
                 Rollout
               </th>
-              <th scope="col" className={cx(s.th, s.colNum)}>
+              <th scope="col" className={css(s.th, s.colNum)}>
                 QTD spend
               </th>
-              <th scope="col" className={s.th}>
+              <th scope="col" className={css(s.th)}>
                 Updated
               </th>
-              <th scope="col" className={cx(s.th, s.colTight)}>
+              <th scope="col" className={css(s.th, s.colTight)}>
                 <span className={s.srOnly}>Actions</span>
               </th>
             </tr>
@@ -123,18 +123,18 @@ export default function Projects() {
               const last = i === projects.length - 1;
               return (
                 <tr key={project.repo} className={s.tr}>
-                  <td className={cx(s.td, last && s.tdLast, s.colTight)}>
+                  <td className={css(s.td, last && s.tdLast, s.colTight)}>
                     <input
                       type="checkbox"
                       aria-label={`Select ${project.name}`}
                       className={s.check}
                     />
                   </td>
-                  <td className={cx(s.td, last && s.tdLast)}>
+                  <td className={css(s.td, last && s.tdLast)}>
                     <div className={s.cellName}>{project.name}</div>
                     <div className={s.cellRepo}>{project.repo}</div>
                   </td>
-                  <td className={cx(s.td, last && s.tdLast)}>
+                  <td className={css(s.td, last && s.tdLast)}>
                     <span className={s.owner}>
                       <span aria-hidden="true" className={avatar({ size: "sm" })}>
                         {project.initials}
@@ -142,13 +142,13 @@ export default function Projects() {
                       {project.owner}
                     </span>
                   </td>
-                  <td className={cx(s.td, last && s.tdLast)}>
+                  <td className={css(s.td, last && s.tdLast)}>
                     <span className={badge({ status: project.status })}>
                       <span className={badgeDot} />
                       {statusLabels[project.status]}
                     </span>
                   </td>
-                  <td className={cx(s.td, last && s.tdLast)}>
+                  <td className={css(s.td, last && s.tdLast)}>
                     <span className={s.progress}>
                       <span className={s.progressTrack}>
                         <span
@@ -159,13 +159,13 @@ export default function Projects() {
                       <span className={s.progressNum}>{project.progress}%</span>
                     </span>
                   </td>
-                  <td className={cx(s.td, last && s.tdLast, s.colNum)}>{project.budget}</td>
-                  <td className={cx(s.td, last && s.tdLast)}>{project.updated}</td>
-                  <td className={cx(s.td, last && s.tdLast, s.colTight)}>
+                  <td className={css(s.td, last && s.tdLast, s.colNum)}>{project.budget}</td>
+                  <td className={css(s.td, last && s.tdLast)}>{project.updated}</td>
+                  <td className={css(s.td, last && s.tdLast, s.colTight)}>
                     <button
                       type="button"
                       aria-label={`Actions for ${project.name}`}
-                      className={iconButton}
+                      className={css(iconButton)}
                     >
                       <DotsIcon />
                     </button>
@@ -246,7 +246,7 @@ const s = {
     borderCollapse: "separate",
     borderSpacing: 0,
   }),
-  th: css({
+  th: css.raw({
     paddingBlock: "10px",
     paddingInline: "14px",
     bg: "surface2",
@@ -266,7 +266,7 @@ const s = {
     transitionProperty: "background-color",
     transitionDuration: "0.12s",
   }),
-  td: css({
+  td: css.raw({
     paddingBlock: "11px",
     paddingInline: "14px",
     borderBottomWidth: "1px",
@@ -275,9 +275,9 @@ const s = {
     fontSize: "13.5px",
     verticalAlign: "middle",
   }),
-  tdLast: css({ borderBottomWidth: "0" }),
-  colNum: css({ textAlign: "right", fontVariantNumeric: "tabular-nums" }),
-  colTight: css({ width: "1%", whiteSpace: "nowrap" }),
+  tdLast: css.raw({ borderBottomWidth: "0" }),
+  colNum: css.raw({ textAlign: "right", fontVariantNumeric: "tabular-nums" }),
+  colTight: css.raw({ width: "1%", whiteSpace: "nowrap" }),
   check: css({ accentColor: "accent", cursor: "pointer" }),
   cellName: css({ fontWeight: 600 }),
   cellRepo: css({ fontFamily: "mono", fontSize: "11.5px", color: "faint", marginTop: "2px" }),
